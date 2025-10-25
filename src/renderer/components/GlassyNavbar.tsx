@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import {
+  Bird,
+  Club,
+  Keyboard,
+  Worm,
+  ShoppingCart,
+  Store
+} from 'lucide-react';
 import './GlassyNavbar.css';
 
 interface NavItem {
@@ -8,7 +16,7 @@ interface NavItem {
     label: string;
     path: string;
     description: string;
-    icon: string;
+    icon: React.ReactNode;
   }[];
 }
 
@@ -26,25 +34,25 @@ const GlassyNavbar: React.FC = () => {
           label: 'Flappy Bird',
           path: '/games/flappy-bird',
           description: 'Classic tap-to-fly clone.',
-          icon: '🐦'
+          icon: <Bird size={20} />
         },
         {
           label: 'Blackjack',
           path: '/games/blackjack',
           description: 'Play to 21 with simple bets.',
-          icon: '🃏'
+          icon: <Club size={20} />
         },
         {
           label: 'Monkeytype',
           path: '/games/monkeytype',
           description: 'Typing practice with stats.',
-          icon: '⌨️'
+          icon: <Keyboard size={20} />
         },
         {
           label: 'Snake Game',
           path: '/games/snake',
           description: 'Grow the snake, avoid the walls.',
-          icon: '🐍'
+          icon: <Worm size={20} />
         },
       ],
     },
@@ -55,13 +63,13 @@ const GlassyNavbar: React.FC = () => {
           label: 'Doordash Order',
           path: '/automation/doordash-order',
           description: 'Auto-place a saved order.',
-          icon: '🍔'
+          icon: <ShoppingCart size={20} />
         },
         {
           label: 'Facebook Marketplace',
           path: '/automation/facebook-marketplace',
           description: 'Search & watch listings.',
-          icon: '🛍️'
+          icon: <Store size={20} />
         },
       ],
     },
@@ -183,7 +191,7 @@ const GlassyNavbar: React.FC = () => {
                         role="menuitem"
                         tabIndex={isKeyboardMode ? 0 : -1}
                       >
-                        <div className="card-icon">{subItem.icon}</div>
+                        <div className="card-icon lucide-icon">{subItem.icon}</div>
                         <div className="card-content">
                           <div className="card-title">{subItem.label}</div>
                           <div className="card-description">{subItem.description}</div>
