@@ -29,6 +29,5 @@ npm-debug.log.*
 *.scss.d.ts
 
 .github/
-.erb/
 .editorconfig
 .vscode/
