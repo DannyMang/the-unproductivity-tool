@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import './App.css';
 import triggerRandomDistraction from './utils/distractions';
+import FbWidget from './components/FbWidget';
 
 // Test that the import worked
 console.log('Distractions module imported:', typeof triggerRandomDistraction);
@@ -35,7 +36,10 @@ function InvisibleOverlay() {
 
     // Set up IPC listener for distractions
     console.log('Setting up IPC listener for TRIGGER_DISTRACTION...');
-    const unsubscribe = window.electronAPI?.on('TRIGGER_DISTRACTION', handleDistraction);
+    const unsubscribe = window.electronAPI?.on(
+      'TRIGGER_DISTRACTION',
+      handleDistraction,
+    );
     console.log('IPC listener set up:', unsubscribe ? 'success' : 'failed');
 
     // Add Electron API mock for development
@@ -97,6 +101,7 @@ function InvisibleOverlay() {
   return (
     <div className="invisible-overlay">
       <div id="distraction-container" ref={distractionContainerRef} />
+      <FbWidget />
     </div>
   );
 }
