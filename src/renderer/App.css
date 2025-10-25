@@ -2,6 +2,10 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
+/* Import Neue Montreal font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 body {
   position: relative;
   color: white;
@@ -12,7 +16,7 @@ body {
     #dd5789 51.77%,
     #7a2c9e 129.35%
   );
-  font-family: sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-y: hidden;
   display: flex;
   justify-content: center;
