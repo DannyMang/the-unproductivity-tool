@@ -5,28 +5,32 @@
 
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Regular.woff' format('woff2');
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Regular.woff'
+    format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Italic.woff' format('woff2');
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Italic.woff'
+    format('woff2');
   font-weight: normal;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Bold.woff' format('woff2');
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Bold.woff'
+    format('woff2');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-BoldItalic.woff' format('woff2');
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-BoldItalic.woff'
+    format('woff2');
   font-weight: bold;
   font-style: italic;
   font-display: swap;
@@ -48,17 +52,9 @@ p {
   font-family: 'Neue Montreal';
 }
 
-
-
 body {
   position: relative;
   height: 100vh;
-<<<<<<< HEAD
-  background: transparent;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-=======
   background: linear-gradient(
     200.96deg,
     #fedc2a -29.09%,
@@ -70,7 +66,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
->>>>>>> d8cf561158b36656f45c259aa95fbac540feae0e
 }
 
 /* Completely invisible overlay - non-intrusive */
@@ -132,17 +127,45 @@ body {
   border-radius: 50%;
 }
 
-
 /* Distraction animations */
 @keyframes shake {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  25% { transform: translateX(-10px) rotate(-5deg); }
-  75% { transform: translateX(10px) rotate(5deg); }
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateX(10px) rotate(5deg);
+  }
 }
 
 @keyframes rainbow {
-  0% { background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3); }
-  100% { background: linear-gradient(45deg, #9400d3, #4b0082, #0000ff, #00ff00, #ffff00, #ff7f00, #ff0000); }
+  0% {
+    background: linear-gradient(
+      45deg,
+      #ff0000,
+      #ff7f00,
+      #ffff00,
+      #00ff00,
+      #0000ff,
+      #4b0082,
+      #9400d3
+    );
+  }
+  100% {
+    background: linear-gradient(
+      45deg,
+      #9400d3,
+      #4b0082,
+      #0000ff,
+      #00ff00,
+      #ffff00,
+      #ff7f00,
+      #ff0000
+    );
+  }
 }
 
 .rainbow-distraction {
@@ -188,6 +211,11 @@ body {
 }
 
 @keyframes flash {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
 }
