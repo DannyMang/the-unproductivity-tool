@@ -2,6 +2,23 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import './App.css';
 
+import FbWidget from './components/FbWidget';
+
+// Components
+import GlassyNavbar from './components/GlassyNavbar';
+
+// Game Components
+import FlappyBird from './components/Games/FlappyBird';
+import Blackjack from './components/Games/Blackjack';
+import Monkeytype from './components/Games/Monkeytype';
+import SnakeGame from './components/Games/SnakeGame';
+
+// Automation Components
+import DoordashOrder from './components/Automation/DoordashOrder';
+import FacebookMarketplace from './components/Automation/FacebookMarketplace';
+
+function Home() {
+
 // Components
 import GlassyNavbar from './components/GlassyNavbar';
 

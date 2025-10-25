@@ -3,8 +3,52 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 
-/* Import Neue Montreal font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Regular.woff' format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Italic.woff' format('woff2');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Bold.woff' format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-BoldItalic.woff' format('woff2');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+h1 {
+  font-family: 'Neue Montreal';
+}
+
+h2 {
+  font-family: 'Neue Montreal';
+}
+
+h3 {
+  font-family: 'Neue Montreal';
+}
+
+p {
+  font-family: 'Neue Montreal';
+}
+
+
 
 body {
   position: relative;
@@ -16,7 +60,7 @@ body {
     #dd5789 51.77%,
     #7a2c9e 129.35%
   );
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Neue Montreal';
   overflow-y: hidden;
   display: flex;
   justify-content: center;
