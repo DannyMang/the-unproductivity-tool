@@ -2,6 +2,54 @@
  * @NOTE: Prepend a `~` to css file paths that are in your node_modules
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Regular.woff' format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Italic.woff' format('woff2');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Bold.woff' format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-BoldItalic.woff' format('woff2');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+h1 {
+  font-family: 'Neue Montreal';
+}
+
+h2 {
+  font-family: 'Neue Montreal';
+}
+
+h3 {
+  font-family: 'Neue Montreal';
+}
+
+p {
+  font-family: 'Neue Montreal';
+}
+
+
+
 body {
   position: relative;
   color: white;
@@ -12,7 +60,7 @@ body {
     #dd5789 51.77%,
     #7a2c9e 129.35%
   );
-  font-family: sans-serif;
+  font-family: 'Neue Montreal';
   overflow-y: hidden;
   display: flex;
   justify-content: center;
