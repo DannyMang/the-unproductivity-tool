@@ -1,109 +1,33 @@
-const DISTRACTION_MESSAGES = [
-  'STOP WORKING! 🎉',
-  'TIME FOR A BREAK! 🎮',
-  'YOU SHOULD BE HAVING FUN! 🎪',
-  'WORK IS BORING! 🚀',
-  'GO WATCH SOME CATS! 🐱',
-  'MEMES ARE WAITING! 😂',
-  'PRODUCTIVITY IS OVERRATED! 🌟',
-  'TAKE A NAP INSTEAD! 😴',
-  'SOCIAL MEDIA CALLS! 📱',
-  'DISTRACT YOURSELF! 🎭',
-];
+import {
+  Heart,
+  Youtube,
+  MessageCircle,
+  Music,
+  Camera,
+  X,
+  Spade,
+  Bird,
+  Type,
+  Zap,
+} from 'lucide-react';
 
 const DISTRACTION_URLS = [
-  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-  'https://www.reddit.com/r/amitheasshole',
-  'https://www.tiktok.com',
-  'https://twitter.com/explore',
-  'https://www.instagram.com/explore',
-  'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-  'https://www.netflix.com',
+  { url: 'https://www.youtube.com/watch?v=rCrwxcZUork', icon: 'youtube' },
+  { url: 'https://www.reddit.com/r/amitheasshole', icon: 'message-circle' },
+  { url: 'https://www.tiktok.com', icon: 'music' },
+  { url: 'https://twitter.com/explore', icon: 'message-circle' },
+  { url: 'https://www.instagram.com/explore', icon: 'camera' },
 ];
 
-const createDistractionPopup = (distractionContainerRef) => {
-  console.log('createDistractionPopup called');
-
-  const popup = document.createElement('div');
-  popup.className = 'distraction-popup';
-  popup.textContent =
-    DISTRACTION_MESSAGES[
-      Math.floor(Math.random() * DISTRACTION_MESSAGES.length)
-    ];
-
-  console.log('Popup message:', popup.textContent);
-  console.log('Window dimensions:', window.innerWidth, window.innerHeight);
-
-  popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
-  popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
-
-  console.log('Popup position:', popup.style.left, popup.style.top);
-
-  popup.onclick = (e) => {
-    console.log('Popup clicked!');
-    // Check if clicked on the X button (right side)
-    if (e.offsetX > popup.offsetWidth - 30) {
-      console.log('Popup closed via X button');
-      popup.remove();
-    } else {
-      console.log('Popup moved to new position');
-      // Move the popup when clicked on the main area
-      popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
-      popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
-    }
-  };
-
-  console.log(
-    'About to append popup to container:',
-    distractionContainerRef.current,
-  );
-  distractionContainerRef.current?.appendChild(popup);
-  console.log('Popup appended to DOM');
-
-  // Auto-remove after 8 seconds
-  setTimeout(() => {
-    console.log('Auto-removing popup');
-    if (popup.parentNode) {
-      popup.remove();
-      console.log('Popup removed');
-    }
-  }, 8000);
+const focusApp = () => {
+  window.electronAPI?.focusWindow();
 };
 
 const openDistractionWebsite = () => {
-  const url =
+  const selectedSite =
     DISTRACTION_URLS[Math.floor(Math.random() * DISTRACTION_URLS.length)];
-  window.electronAPI?.openExternal(url);
-};
-
-const createRainbowDistraction = (distractionContainerRef) => {
-  const rainbow = document.createElement('div');
-  rainbow.className = 'rainbow-distraction';
-  rainbow.style.left = `${Math.random() * (window.innerWidth - 200)}px`;
-  rainbow.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
-
-  distractionContainerRef.current?.appendChild(rainbow);
-
-  setTimeout(() => rainbow.remove(), 3000);
-};
-
-const createFlyingElements = (distractionContainerRef) => {
-  const elements = ['🦄', '🌈', '🎪', '🎮', '🎯', '🎨', '🎭', '🎪'];
-
-  for (let i = 0; i < 5; i++) {
-    setTimeout(() => {
-      const element = document.createElement('div');
-      element.className = 'flying-element';
-      element.textContent =
-        elements[Math.floor(Math.random() * elements.length)];
-      element.style.top = `${Math.random() * window.innerHeight}px`;
-      element.style.animationDelay = `${i * 0.5}s`;
-
-      distractionContainerRef.current?.appendChild(element);
-
-      setTimeout(() => element.remove(), 10000);
-    }, i * 1000);
-  }
+  window.electronAPI?.openExternal(selectedSite.url);
+  return selectedSite.icon;
 };
 
 const flashScreen = (distractionContainerRef) => {
@@ -124,6 +48,162 @@ const flashScreen = (distractionContainerRef) => {
     }, i * 300);
   }
 };
+
+// Helper function to get SVG paths for Lucide icons
+const getIconSvg = (iconName) => {
+  const icons = {
+    youtube:
+      '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 18c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>',
+    'message-circle':
+      '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>',
+    music:
+      '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>',
+    camera:
+      '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle>',
+    Spade:
+      '<path d="M12 2l-2.5 6.5L3 10l4.5 3L5 20l7-5 7 5-2.5-7L21 10l-6.5-1.5L12 2z"></path>',
+    Bird: '<path d="M18 2l-1 4.5L13 2l-1 4.5L8 2l1 4.5L2 12l6.5 2.5L12 21l3.5-6.5L22 12l-7-5.5L16 2z"></path>',
+    Type: '<polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line>',
+    Zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>',
+  };
+  return icons[iconName] || icons['Zap'];
+};
+
+// Game URLs for iframe embedding (matching GlassyNavbar.tsx)
+const gameUrls = {
+  'Flappy Bird': 'https://flappybird.io/',
+  Blackjack: 'https://playpager.com/blackjack-game/',
+  'Typing Test': 'https://www.keybr.com/',
+  'Snake Game': 'https://googlesnakemods.com/v/current/',
+};
+
+const createGameWidgetDistraction = (distractionContainerRef) => {
+  const games = [
+    { name: 'Flappy Bird', icon: 'Bird', color: '#fbbf24' },
+    { name: 'Blackjack', icon: 'Spade', color: '#1a1a1a' },
+    { name: 'Typing Test', icon: 'Type', color: '#10b981' },
+    { name: 'Snake Game', icon: 'Zap', color: '#8b5cf6' },
+  ];
+
+  const selectedGame = games[Math.floor(Math.random() * games.length)];
+  const gameUrl = gameUrls[selectedGame.name];
+
+  const widget = document.createElement('div');
+  widget.className = 'game-widget-distraction';
+
+  // Create widget content with iframe (matching GlassyNavbar.tsx implementation)
+  widget.innerHTML = `
+    <div class="game-widget-header">
+      <span class="game-widget-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: ${selectedGame.color}; margin-right: 8px;">
+          ${getIconSvg(selectedGame.icon)}
+        </svg>
+        ${selectedGame.name}
+      </span>
+      <span class="game-widget-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </span>
+    </div>
+    <div class="game-widget-content">
+      <div class="game-widget-iframe-container">
+        <iframe
+          src="${gameUrl}"
+          class="game-widget-iframe"
+          title="${selectedGame.name}"
+          frameborder="0"
+          allowfullscreen
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        ></iframe>
+      </div>
+    </div>
+  `;
+
+  // Position widget randomly on screen (matching GlassyNavbar.tsx sizing)
+  const maxX = window.innerWidth - 850; // 800px width + 50px margin
+  const maxY = window.innerHeight - 750; // 700px height + 50px margin
+
+  widget.style.left = `${Math.max(50, Math.random() * maxX)}px`;
+  widget.style.top = `${Math.max(50, Math.random() * maxY)}px`;
+
+  // Add close functionality
+  const closeBtn = widget.querySelector('.game-widget-close');
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    widget.remove();
+  });
+
+  // Add drag to reposition functionality (matching GlassyNavbar.tsx implementation)
+  let isDragging = false;
+  let currentX: number;
+  let currentY: number;
+  let initialX: number;
+  let initialY: number;
+  let xOffset = 0;
+  let yOffset = 0;
+
+  const header = widget.querySelector('.game-widget-header');
+
+  // Declare functions before using them
+  function dragStart(e: MouseEvent) {
+    if ((e.target as Element).classList.contains('game-widget-close')) return;
+
+    initialX = e.clientX - xOffset;
+    initialY = e.clientY - yOffset;
+
+    if (e.target === header || header.contains(e.target as Node)) {
+      isDragging = true;
+    }
+  }
+
+  function drag(e: MouseEvent) {
+    if (isDragging) {
+      e.preventDefault();
+      currentX = e.clientX - initialX;
+      currentY = e.clientY - initialY;
+
+      xOffset = currentX;
+      yOffset = currentY;
+
+      // Keep widget within screen bounds (matching GlassyNavbar.tsx)
+      const newX = Math.max(0, Math.min(window.innerWidth - 850, currentX));
+      const newY = Math.max(0, Math.min(window.innerHeight - 750, currentY));
+
+      widget.style.transform = `translate(${newX}px, ${newY}px)`;
+    }
+  }
+
+  function dragEnd(e: MouseEvent) {
+    initialX = currentX;
+    initialY = currentY;
+    isDragging = false;
+  }
+
+  header?.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+
+  distractionContainerRef.current?.appendChild(widget);
+
+  // Ensure window is focused when game widget appears
+  setTimeout(() => {
+    focusApp();
+  }, 100);
+};
+
+// Timeout management (imported from App component through global scope)
+declare global {
+  interface Window {
+    distractionTimeout?: {
+      canTriggerDistraction: () => boolean;
+      startCooldown: () => void;
+      getRemainingCooldownTime: () => number;
+    };
+  }
+}
+
 const triggerRandomDistraction = (distractionContainerRef) => {
   console.log('triggerRandomDistraction called with:', distractionContainerRef);
   console.log(
@@ -131,34 +211,41 @@ const triggerRandomDistraction = (distractionContainerRef) => {
     distractionContainerRef?.current,
   );
 
-  const distractionType = Math.floor(Math.random() * 5);
+  // Check if distraction is allowed (additional safety check)
+  if (
+    window.distractionTimeout &&
+    !window.distractionTimeout.canTriggerDistraction()
+  ) {
+    const remainingTime = window.distractionTimeout.getRemainingCooldownTime();
+    console.log(
+      `Distraction blocked by timeout system: ${remainingTime}s remaining`,
+    );
+    return false;
+  }
+
+  const distractionType = Math.floor(Math.random() * 2); // Reduced to 2 distraction types
   console.log('Selected distraction type:', distractionType);
 
   switch (distractionType) {
     case 0:
-      console.log('Creating distraction popup...');
-      createDistractionPopup(distractionContainerRef);
-      break;
-    case 1:
       console.log('Opening distraction website...');
       openDistractionWebsite();
       break;
-    case 2:
-      console.log('Creating rainbow distraction...');
-      createRainbowDistraction(distractionContainerRef);
-      break;
-    case 3:
-      console.log('Creating flying elements...');
-      createFlyingElements(distractionContainerRef);
-      break;
-    case 4:
-      console.log('Creating screen flash...');
-      flashScreen(distractionContainerRef);
+    case 1:
+      console.log('Creating game widget distraction...');
+      createGameWidgetDistraction(distractionContainerRef);
       break;
     default:
-      console.log('Default case: creating distraction popup...');
-      createDistractionPopup(distractionContainerRef);
+      console.log('Default case: opening distraction website...');
+      openDistractionWebsite();
   }
+
+  // Start cooldown after successful distraction
+  if (window.distractionTimeout) {
+    window.distractionTimeout.startCooldown();
+  }
+
+  return true;
 };
 
 export default triggerRandomDistraction;
