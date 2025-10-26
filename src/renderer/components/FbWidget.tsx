@@ -31,7 +31,7 @@ function FbWidget({ isMinimized, onMinimizeToggle }) {
           <img id="fbicon" src={fbMarketIcon} alt="Facebook Marketplace" />
           {!isMinimized && (
             <div>
-              <h2>Lowballer</h2>
+              <h2>Marketplace Lowballer</h2>
               <p id="fbstatus">Active</p>
             </div>
           )}
