@@ -745,9 +745,11 @@ async function completeOrder(orderSession) {
     orderSession.status = 'completing';
 
     // Go to cart
+    console.log(`[${orderId}] Looking for cart button...`);
     const cartSelectors = [
       '[data-testid="CartButton"]',
       '[data-testid="cart-button"]',
+      '[data-testid="OrderCartIconButton"]',
       'button[aria-label*="Cart"]',
       '[class*="CartButton"]',
     ];
@@ -755,24 +757,35 @@ async function completeOrder(orderSession) {
     let cartButton = null;
     for (const selector of cartSelectors) {
       cartButton = await page.$(selector);
-      if (cartButton) break;
+      if (cartButton) {
+        console.log(`[${orderId}] Found cart button with selector: ${selector}`);
+        break;
+      }
     }
 
     if (cartButton) {
       await cartButton.click();
-      await wait(1000);
+      console.log(`[${orderId}] Clicked cart button, waiting for cart to open...`);
+      await wait(2000);
+    } else {
+      console.log(`[${orderId}] Could not find cart button, trying to navigate directly to checkout`);
     }
 
     // Click checkout
+    console.log(`[${orderId}] Looking for checkout button...`);
     const checkoutSelectors = [
       '[data-testid="CheckoutButton"]',
       '[class*="CheckoutButton"]',
+      'button[data-testid*="checkout" i]',
     ];
 
     let checkoutButton = null;
     for (const selector of checkoutSelectors) {
       checkoutButton = await page.$(selector);
-      if (checkoutButton) break;
+      if (checkoutButton) {
+        console.log(`[${orderId}] Found checkout button with selector: ${selector}`);
+        break;
+      }
     }
 
     // If no button found by selector, search by text content
@@ -782,11 +795,13 @@ async function completeOrder(orderSession) {
         return buttons.find(
           (btn) =>
             btn.textContent.includes('Checkout') ||
-            btn.textContent.includes('Go to Checkout'),
+            btn.textContent.includes('Go to Checkout') ||
+            btn.textContent.includes('Continue to Checkout'),
         );
       });
       if (checkoutButton && (await checkoutButton.asElement())) {
         checkoutButton = await checkoutButton.asElement();
+        console.log(`[${orderId}] Found checkout button by text content`);
       } else {
         checkoutButton = null;
       }
@@ -794,23 +809,212 @@ async function completeOrder(orderSession) {
 
     if (checkoutButton) {
       await checkoutButton.click();
-      await wait(1500);
+      console.log(`[${orderId}] Clicked checkout button, waiting for checkout page...`);
+      await wait(3000); // Wait longer for checkout page to load
+    } else {
+      console.log(`[${orderId}] ⚠️  Could not find checkout button`);
     }
 
-    // NOTE: We stop here before actually placing the order to avoid real charges
-    // In production with user consent, you would click the final "Place Order" button
+    // Wait for checkout page to fully load
+    console.log(`[${orderId}] Current URL: ${page.url()}`);
 
-    console.log(
-      `[${orderId}] ✅ Order ready for checkout (stopped before final placement)`,
-    );
-    console.log(
-      `[${orderId}] ⚠️  In demo mode - not actually placing order to avoid charges`,
-    );
+    // Handle any intermediate checkout steps
+    // Look for "Continue" or "Next" buttons that might appear before final order
+    console.log(`[${orderId}] Checking for intermediate checkout steps...`);
+    await wait(1000);
 
-    orderSession.status = 'confirmed';
+    const continueButton = await page.evaluateHandle(() => {
+      const buttons = Array.from(document.querySelectorAll('button'));
+      return buttons.find(
+        (btn) =>
+          btn.textContent.includes('Continue') ||
+          btn.textContent.includes('Next') ||
+          btn.textContent.includes('Proceed'),
+      );
+    });
 
-    // Keep browser open for 10 seconds to show the checkout page
-    await wait(10000);
+    if (continueButton && (await continueButton.asElement())) {
+      const continueEl = await continueButton.asElement();
+      console.log(`[${orderId}] Found Continue/Next button, clicking...`);
+      await continueEl.click();
+      console.log(`[${orderId}] Waiting for alcohol consent modal to appear...`);
+      await wait(7000); // Wait even longer for modal to fully render after clicking Continue
+    }
+
+    // Handle the "ID required at the door" confirmation modal FIRST
+    console.log(`[${orderId}] Looking for "Sign and accept" modal...`);
+    await wait(2000); // Wait for modal to fully render before checking
+
+    // Check for modal by looking for specific modal patterns
+    // The modal might have "Next" or "Sign and accept" as button text
+    let modalDismissed = false;
+    const maxAttempts = 3;
+
+    for (let attempt = 1; attempt <= maxAttempts && !modalDismissed; attempt++) {
+      console.log(`[${orderId}] Checking for modal (attempt ${attempt}/${maxAttempts})...`);
+
+      const modalInfo = await page.evaluate(() => {
+        // Check if there's a modal overlay visible
+        const hasOverlay = document.querySelector('[role="dialog"], [class*="modal" i], [class*="Modal" i]') !== null;
+
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const buttonTexts = buttons.map(btn => btn.textContent?.trim().toLowerCase());
+
+        // Look for "Go Back" button which indicates a modal is present
+        const hasGoBack = buttonTexts.some(text => text === 'go back');
+
+        return {
+          hasOverlay,
+          hasGoBack,
+          allButtons: buttons.map((btn) => ({
+            text: btn.textContent?.trim().substring(0, 100),
+            visible: btn.offsetParent !== null,
+          }))
+        };
+      });
+
+      console.log(`[${orderId}] Modal detected: ${modalInfo.hasOverlay || modalInfo.hasGoBack}`);
+
+      if (modalInfo.hasOverlay || modalInfo.hasGoBack) {
+        console.log(`[${orderId}] Modal is present, looking for confirmation button...`);
+
+        // Debug: Show what buttons are in the modal
+        const modalButtonInfo = await page.evaluate(() => {
+          const modal = document.querySelector('[role="dialog"]');
+          if (!modal) {
+            return { found: false, buttons: [] };
+          }
+
+          const modalButtons = Array.from(modal.querySelectorAll('button'));
+          return {
+            found: true,
+            buttons: modalButtons.map(btn => ({
+              text: btn.textContent?.trim().substring(0, 50),
+              kind: btn.getAttribute('kind'),
+              visible: btn.offsetParent !== null,
+            }))
+          };
+        });
+
+        console.log(`[${orderId}] Buttons in modal:`, JSON.stringify(modalButtonInfo, null, 2));
+
+        // Try to find and click the confirmation button
+        // Looking for button with kind="BUTTON/PRIMARY" inside modal with role="dialog"
+        const confirmButton = await page.evaluateHandle(() => {
+          // First, check if there's a modal dialog visible
+          const modal = document.querySelector('[role="dialog"]');
+          if (!modal) {
+            return null;
+          }
+
+          // Find all buttons within the modal
+          const modalButtons = Array.from(modal.querySelectorAll('button'));
+
+          // Priority 1: Button with "Sign and accept" text (highest priority!)
+          let primaryButton = modalButtons.find(btn => {
+            const text = btn.textContent?.trim().toLowerCase() || '';
+            const isVisible = btn.offsetParent !== null;
+
+            return isVisible && (
+              text.includes('sign and accept') ||
+              text.includes('sign & accept')
+            );
+          });
+
+          if (primaryButton) {
+            return primaryButton;
+          }
+
+          // Priority 2: Primary button in modal (usually the accept button)
+          primaryButton = modalButtons.find(btn => {
+            const kind = btn.getAttribute('kind');
+            const isVisible = btn.offsetParent !== null;
+
+            return isVisible && kind && kind.includes('PRIMARY');
+          });
+
+          if (primaryButton) {
+            return primaryButton;
+          }
+
+          // Priority 3: "Next" button ONLY as last resort
+          primaryButton = modalButtons.find(btn => {
+            const text = btn.textContent?.trim().toLowerCase() || '';
+            const isVisible = btn.offsetParent !== null;
+
+            return isVisible && text === 'next';
+          });
+
+          return primaryButton;
+        });
+
+        if (confirmButton && (await confirmButton.asElement())) {
+          const confirmEl = await confirmButton.asElement();
+          const buttonText = await page.evaluate(el => el.textContent?.trim(), confirmEl);
+          console.log(`[${orderId}] Found confirmation button: "${buttonText}", clicking...`);
+          await confirmEl.click();
+          await wait(2000); // Wait for next page/modal
+
+          // If we clicked "Next", check if there's another modal page with "Sign and accept"
+          if (buttonText.toLowerCase() === 'next') {
+            console.log(`[${orderId}] Clicked "Next", checking for "Sign and accept" button...`);
+            await wait(2000); // Wait for second modal page to load
+
+            const signAndAcceptButton = await page.evaluateHandle(() => {
+              const modal = document.querySelector('[role="dialog"]');
+              if (!modal) {
+                return null;
+              }
+
+              const modalButtons = Array.from(modal.querySelectorAll('button'));
+              return modalButtons.find(btn => {
+                const text = btn.textContent?.trim().toLowerCase() || '';
+                const isVisible = btn.offsetParent !== null;
+
+                return isVisible && (
+                  text.includes('sign and accept') ||
+                  text.includes('sign & accept')
+                );
+              });
+            });
+
+            if (signAndAcceptButton && (await signAndAcceptButton.asElement())) {
+              const signEl = await signAndAcceptButton.asElement();
+              console.log(`[${orderId}] Found "Sign and accept" button, clicking to finalize...`);
+              await signEl.click();
+              await wait(2000);
+              console.log(`[${orderId}] ✓ Signed and accepted alcohol terms`);
+            } else {
+              console.log(`[${orderId}] Warning: Could not find "Sign and accept" button on second modal page`);
+            }
+          }
+
+          console.log(`[${orderId}] ✓ Modal dismissed`);
+          modalDismissed = true;
+          break;
+        }
+      }
+
+      if (!modalDismissed && attempt < maxAttempts) {
+        console.log(`[${orderId}] Modal button not found yet, waiting longer...`);
+        await wait(3000); // Wait longer before next attempt
+      }
+    }
+
+    if (!modalDismissed) {
+      console.log(`[${orderId}] No modal confirmation needed or already dismissed`);
+    }
+
+    // Don't automatically click Place Order - let user review and click manually
+    console.log(`[${orderId}] ✅ Order ready for checkout!`);
+    console.log(`[${orderId}] 🍺 Please review the order in the browser and click "Place Order" to finalize`);
+    console.log(`[${orderId}] Browser will remain open for 5 minutes...`);
+
+    orderSession.status = 'ready_for_manual_confirmation';
+
+    // Keep browser open for 5 minutes so user can manually review and place order
+    await wait(300000); // 5 minutes
+    console.log(`[${orderId}] Closing browser after 5 minute timeout...`);
     await browser.close();
   } catch (error) {
     console.error(`[${orderId}] Error completing order:`, error);

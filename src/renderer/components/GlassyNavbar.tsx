@@ -530,59 +530,6 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
             </div>
           ))}
         </div>
-
-        {/* Order Status Display */}
-        {orderNotification && (
-          <div className="navbar-notification">
-            <div
-              style={{
-                backgroundColor: orderNotification.includes('🎉')
-                  ? '#10b981'
-                  : '#ef4444',
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                fontSize: '13px',
-                fontWeight: '500',
-                opacity: 0.95,
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                minWidth: '200px',
-                maxWidth: '300px',
-                justifyContent: 'center',
-                animation: 'slideIn 0.3s ease-out',
-              }}
-            >
-              {orderNotification}
-            </div>
-          </div>
-        )}
-
-        {/* Cooldown Status Display */}
-        <div className="navbar-cooldown">
-          <div
-            style={{
-              backgroundColor: canTest ? '#10b981' : '#6b7280',
-              color: 'white',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              fontSize: '14px',
-              fontWeight: '500',
-              opacity: 0.9,
-              transition: 'all 0.3s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              minWidth: '160px',
-              justifyContent: 'center',
-            }}
-          >
-            <Zap size={14} />
-            {canTest ? 'Ready' : `Cooldown: ${remainingCooldown}s`}
-          </div>
-        </div>
       </div>
     </nav>
   );
