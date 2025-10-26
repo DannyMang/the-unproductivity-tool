@@ -79,20 +79,17 @@ if (!gotTheLock) {
 
   // Application detection system
   const TARGET_APPLICATIONS = [
-    // 'Code', // VS Code
-    // 'Terminal', // Terminal
-    'iTerm', // iTerm2
-    'Sublime Text', // Sublime Text
-    'Atom', // Atom editor
-    'WebStorm', // JetBrains IDEs
-    'IntelliJ', // IntelliJ IDEA
-    'PyCharm', // PyCharm
-    'Xcode', // Xcode
-    'Visual Studio', // Visual Studio
+    'Code', // VS Code
+    'Terminal', // Terminal
     'Figma', // Figma
     'Slack', // Slack
     'Notion', // Notion
     'Spotify', // Spotify
+    'MSTeams',
+    'Google Chrome',
+    'firefox',
+    'zed',
+    'Mail',
   ];
 
   let monitoringInterval: NodeJS.Timeout | null = null;
