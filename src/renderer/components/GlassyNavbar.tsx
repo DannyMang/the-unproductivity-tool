@@ -123,7 +123,7 @@ interface NavItem {
   }[];
 }
 
-const GlassyNavbar = () => {
+function GlassyNavbar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
   const timeoutRef = useRef<number | null>(null);
@@ -140,7 +140,7 @@ const GlassyNavbar = () => {
           icon: <Bird size={20} />,
           isGame: true,
           gameName: 'Flappy Bird',
-          gameEmoji: '🐦',
+          gameEmoji: '',
         },
         {
           label: 'Blackjack',
@@ -149,7 +149,7 @@ const GlassyNavbar = () => {
           icon: <Club size={20} />,
           isGame: true,
           gameName: 'Blackjack',
-          gameEmoji: '♠️',
+          gameEmoji: '',
         },
         {
           label: 'Typing Test',
@@ -158,7 +158,7 @@ const GlassyNavbar = () => {
           icon: <Keyboard size={20} />,
           isGame: true,
           gameName: 'Typing Test',
-          gameEmoji: '🐒',
+          gameEmoji: '',
         },
         {
           label: 'Snake Game',
@@ -167,7 +167,7 @@ const GlassyNavbar = () => {
           icon: <Worm size={20} />,
           isGame: true,
           gameName: 'Snake Game',
-          gameEmoji: '🐍',
+          gameEmoji: '',
         },
       ],
     },
@@ -384,6 +384,6 @@ const GlassyNavbar = () => {
       </div>
     </nav>
   );
-};
+}
 
 export default GlassyNavbar;

@@ -1,14 +1,14 @@
 const DISTRACTION_MESSAGES = [
-  'STOP WORKING! 🎉',
-  'TIME FOR A BREAK! 🎮',
-  'YOU SHOULD BE HAVING FUN! 🎪',
-  'WORK IS BORING! 🚀',
-  'GO WATCH SOME CATS! 🐱',
-  'MEMES ARE WAITING! 😂',
-  'PRODUCTIVITY IS OVERRATED! 🌟',
-  'TAKE A NAP INSTEAD! 😴',
-  'SOCIAL MEDIA CALLS! 📱',
-  'DISTRACT YOURSELF! 🎭',
+  'STOP WORKING! Time for fun!',
+  'TIME FOR A BREAK! Relax a bit',
+  'YOU SHOULD BE HAVING FUN! Enjoy yourself',
+  'WORK IS BORING! Do something exciting',
+  'GO WATCH SOME CATS! They are waiting',
+  'MEMES ARE WAITING! Time to laugh',
+  'PRODUCTIVITY IS OVERRATED! Take it easy',
+  'TAKE A NAP INSTEAD! Rest well',
+  'SOCIAL MEDIA CALLS! Check notifications',
+  'DISTRACT YOURSELF! Have some fun',
 ];
 
 const DISTRACTION_URLS = [
@@ -70,7 +70,8 @@ const createRainbowDistraction = (distractionContainerRef) => {
 };
 
 const createFlyingElements = (distractionContainerRef) => {
-  const elements = ['🦄', '🌈', '🎪', '🎮', '🎯', '🎨', '🎭', '🎪'];
+  // Use text-based fun elements instead of emojis
+  const elements = ['✨', '⭐', '🌟', '💫', '🎯', '🎨', '🎪', '🎮'];
 
   for (let i = 0; i < 5; i++) {
     setTimeout(() => {

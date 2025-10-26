@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Zap } from 'lucide-react';
 import './App.css';
 import triggerRandomDistraction from './utils/distractions';
 import icon from '../../assets/icon.png';
@@ -33,7 +34,7 @@ let lastDistractionTime = 0;
 // Helper functions for timeout management
 const canTriggerDistraction = (): boolean => {
   const now = Date.now();
-  return !isOnCooldown && (now - lastDistractionTime) >= COOLDOWN_PERIOD;
+  return !isOnCooldown && now - lastDistractionTime >= COOLDOWN_PERIOD;
 };
 
 const startCooldown = () => {
@@ -98,7 +99,9 @@ function DistractionOverlay() {
   const safeTriggerDistraction = useCallback((source: string) => {
     if (!canTriggerDistraction()) {
       const remainingTime = getRemainingCooldownTime();
-      console.log(`Distraction blocked from ${source}: ${remainingTime}s remaining on cooldown`);
+      console.log(
+        `Distraction blocked from ${source}: ${remainingTime}s remaining on cooldown`,
+      );
       return false;
     }
 
@@ -109,7 +112,10 @@ function DistractionOverlay() {
       console.log(`Distraction triggered successfully from ${source}`);
       return true;
     } catch (error) {
-      console.error(`Error calling triggerRandomDistraction from ${source}:`, error);
+      console.error(
+        `Error calling triggerRandomDistraction from ${source}:`,
+        error,
+      );
       return false;
     }
   }, []);
@@ -210,80 +216,26 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleManualTest = () => {
-    const container = document.getElementById('distraction-container');
-    if (container) {
-      if (safeTriggerDistraction('manual test button')) {
-        // Update state immediately after triggering
-        setRemainingCooldown(60);
-        setCanTest(false);
-      }
-    } else {
-      console.error('Distraction container not found');
-    }
-  };
-
+  
   return (
     <div>
       <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>The Unproductivity Tool</h1>
-      <p
-        style={{
-          maxWidth: '600px',
-          margin: '0 auto',
-          textAlign: 'center',
-          lineHeight: '1.6',
-        }}
-      >
-        A collection of fun games and automation tools to help you be more
-        productive... or not!
-      </p>
-      <div className="Hello">
-        <button
-          type="button"
-          onClick={handleManualTest}
-          disabled={!canTest}
+        <div
           style={{
-            backgroundColor: canTest ? '#ff6b6b' : '#cccccc',
+            backgroundColor: canTest ? '#10b981' : '#6b7280',
             color: 'white',
-            border: 'none',
             padding: '10px 20px',
             margin: '10px',
             borderRadius: '5px',
-            cursor: canTest ? 'pointer' : 'not-allowed',
             fontSize: '16px',
-            opacity: canTest ? 1 : 0.6,
+            opacity: 0.9,
             transition: 'all 0.3s ease',
+            display: 'inline-block',
           }}
         >
-          🎉 {canTest ? 'Test Distraction' : `Cooldown: ${remainingCooldown}s`}
-        </button>
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
+          <Zap size={16} style={{ marginRight: '8px' }} />
+          {canTest ? 'Distraction ready to fire' : `Cooldown: ${remainingCooldown}s`}
+        </div>
       </div>
     </div>
   );
@@ -291,7 +243,8 @@ function Home() {
 
 export default function App() {
   const [isFbWidgetMinimized, setIsFbWidgetMinimized] = useState(false);
-  const [isDoordashWidgetMinimized, setIsDoordashWidgetMinimized] = useState(false);
+  const [isDoordashWidgetMinimized, setIsDoordashWidgetMinimized] =
+    useState(false);
 
   const toggleFbWidget = () => {
     setIsFbWidgetMinimized(!isFbWidgetMinimized);

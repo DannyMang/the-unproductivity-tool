@@ -60,8 +60,20 @@ if (!gotTheLock) {
   // Handle focus window requests from renderer
   ipcMain.on('FOCUS_WINDOW', async () => {
     if (mainWindow) {
+      console.log('FOCUS_WINDOW: Bringing window to front');
       if (mainWindow.isMinimized()) mainWindow.restore();
+
+      // Ensure window is on top and focused
+      mainWindow.setAlwaysOnTop(true, 'screen-saver');
       mainWindow.focus();
+      mainWindow.show();
+
+      // Reset always on top after a short delay
+      setTimeout(() => {
+        if (mainWindow) {
+          mainWindow.setAlwaysOnTop(false);
+        }
+      }, 1000);
     }
   });
 

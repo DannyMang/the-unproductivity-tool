@@ -1,9 +1,11 @@
+import { Heart, Youtube, MessageCircle, Music, Camera, X, Spade, Bird, Type, Zap } from 'lucide-react';
+
 const DISTRACTION_URLS = [
-  'https://www.youtube.com/watch?v=rCrwxcZUork',
-  'https://www.reddit.com/r/amitheasshole',
-  'https://www.tiktok.com',
-  'https://twitter.com/explore',
-  'https://www.instagram.com/explore',
+  { url: 'https://www.youtube.com/watch?v=rCrwxcZUork', icon: 'youtube' },
+  { url: 'https://www.reddit.com/r/amitheasshole', icon: 'message-circle' },
+  { url: 'https://www.tiktok.com', icon: 'music' },
+  { url: 'https://twitter.com/explore', icon: 'message-circle' },
+  { url: 'https://www.instagram.com/explore', icon: 'camera' },
 ];
 
 const focusApp = () => {
@@ -11,9 +13,10 @@ const focusApp = () => {
 };
 
 const openDistractionWebsite = () => {
-  const url =
+  const selectedSite =
     DISTRACTION_URLS[Math.floor(Math.random() * DISTRACTION_URLS.length)];
-  window.electronAPI?.openExternal(url);
+  window.electronAPI?.openExternal(selectedSite.url);
+  return selectedSite.icon;
 };
 
 const flashScreen = (distractionContainerRef) => {
@@ -35,12 +38,27 @@ const flashScreen = (distractionContainerRef) => {
   }
 };
 
+// Helper function to get SVG paths for Lucide icons
+const getIconSvg = (iconName) => {
+  const icons = {
+    'youtube': '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 18c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>',
+    'message-circle': '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>',
+    'music': '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>',
+    'camera': '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle>',
+    'Spade': '<path d="M12 2l-2.5 6.5L3 10l4.5 3L5 20l7-5 7 5-2.5-7L21 10l-6.5-1.5L12 2z"></path>',
+    'Bird': '<path d="M18 2l-1 4.5L13 2l-1 4.5L8 2l1 4.5L2 12l6.5 2.5L12 21l3.5-6.5L22 12l-7-5.5L16 2z"></path>',
+    'Type': '<polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line>',
+    'Zap': '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>'
+  };
+  return icons[iconName] || icons['Zap'];
+};
+
 const createGameWidgetDistraction = (distractionContainerRef) => {
   const games = [
-    { name: 'Blackjack', emoji: '♠️' },
-    { name: 'Flappy Bird', emoji: '🐦' },
-    { name: 'Monkeytype', emoji: '🐒' },
-    { name: 'Snake Game', emoji: '🐍' },
+    { name: 'Blackjack', icon: 'Spade', color: '#1a1a1a' },
+    { name: 'Flappy Bird', icon: 'Bird', color: '#fbbf24' },
+    { name: 'Monkeytype', icon: 'Type', color: '#10b981' },
+    { name: 'Snake Game', icon: 'Zap', color: '#8b5cf6' },
   ];
 
   const selectedGame = games[Math.floor(Math.random() * games.length)];
@@ -48,18 +66,30 @@ const createGameWidgetDistraction = (distractionContainerRef) => {
   const widget = document.createElement('div');
   widget.className = 'game-widget-distraction';
 
-  // Create widget content
+  // Create widget content with Lucide icons
   widget.innerHTML = `
     <div class="game-widget-header">
-      <span class="game-widget-title">${selectedGame.emoji} ${selectedGame.name}</span>
-      <span class="game-widget-close">×</span>
+      <span class="game-widget-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: ${selectedGame.color}; margin-right: 8px;">
+          ${getIconSvg(selectedGame.icon)}
+        </svg>
+        ${selectedGame.name}
+      </span>
+      <span class="game-widget-close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </span>
     </div>
     <div class="game-widget-content">
       <div class="game-widget-preview">
         <h3>${selectedGame.name}</h3>
         <p>Coming soon...</p>
         <div class="game-widget-placeholder">
-          <span class="game-widget-emoji">${selectedGame.emoji}</span>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: ${selectedGame.color};">
+            ${getIconSvg(selectedGame.icon)}
+          </svg>
         </div>
       </div>
     </div>
@@ -129,7 +159,13 @@ const createGameWidgetDistraction = (distractionContainerRef) => {
   }
 
   distractionContainerRef.current?.appendChild(widget);
+
+  // Ensure window is focused when game widget appears
+  setTimeout(() => {
+    focusApp();
+  }, 100);
 };
+
 // Timeout management (imported from App component through global scope)
 declare global {
   interface Window {
