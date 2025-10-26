@@ -1,0 +1,97 @@
+.widgetContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 2vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 20px;
+    width: 700px;
+    min-width: 700px;
+    max-width: 700px;
+}
+
+.spacedFlex {
+    display: flex;
+    justify-content: space-between;
+}
+
+.spacedFlexColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6vw;
+}
+
+.normFlex {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 1vw;
+}
+
+.bottomAlign {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 2vw;
+}
+
+#fbicon {
+    border-radius: 8px;
+    height: 5vw;
+}
+
+#ryanheadshot {
+    border-radius: 8px;
+    height: 10vw;
+    width: 10vw;
+    object-fit: cover;
+}
+
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#fbstatus{
+    display: inline-block;
+    background-color: greenyellow;
+    color: green;
+    border-radius: 100px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.carouselButton {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.carousel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 2vw;
+}
+
+.carouselCounter {
+    color: white;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
