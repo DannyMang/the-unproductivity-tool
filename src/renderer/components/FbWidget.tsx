@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './FbWidget.css';
 import fbMarketIcon from '../../../assets/images/fbmarketicon.png';
 import ryanHeadshot from '../../../assets/images/ryanheadshot.jpg';
 import ryanNya from '../../../assets/images/ryannya.jpg';
 import animeRyan from '../../../assets/images/animeryan.jpg';
 
-function FbWidget() {
+function FbWidget({ isMinimized, onMinimizeToggle }) {
   // Example data for multiple offers
   const offers = [
-    { priceListed: 100, priceOffered: 90, status: 'Offer Sent', headshot: ryanHeadshot },
-    { priceListed: 200, priceOffered: 180, status: 'Successful', headshot: ryanNya },
-    { priceListed: 150, priceOffered: 130, status: 'Pending', headshot: animeRyan },
+    { priceListed: 100, priceOffered: 90, status: 'Offer Sent', statusColor: 'orange', headshot: ryanHeadshot },
+    { priceListed: 200, priceOffered: 180, status: 'Successful', statusColor: 'green', headshot: ryanNya },
+    { priceListed: 150, priceOffered: 130, status: 'Pending', statusColor: 'yellow', headshot: animeRyan },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -24,43 +25,68 @@ function FbWidget() {
   };
 
   return (
-    <div className="widgetContainer">
-      <div className="normFlex">
-        <img id="fbicon" src={fbMarketIcon} alt="Facebook Marketplace" />
-        <div>
-          <h2>Lowballer</h2>
-          <p id="fbstatus">Active</p>
+    <div className={`widgetContainer ${isMinimized ? 'minimized' : ''}`}>
+      <div className="widgetHeader">
+        <div className="normFlex">
+          <img id="fbicon" src={fbMarketIcon} alt="Facebook Marketplace" />
+          {!isMinimized && (
+            <div>
+              <h2>Lowballer</h2>
+              <p id="fbstatus">Active</p>
+            </div>
+          )}
         </div>
+        <button onClick={onMinimizeToggle} className="hideButton">
+          {isMinimized ? 'Show' : 'Hide'}
+        </button>
       </div>
 
-      {/* Carousel implementation */}
-      <button onClick={handlePrev} className="carouselButton">‹</button>
-      <div className="carousel">
-        <div>
-          <div className="normFlex">
-            <img
-              id="ryanheadshot"
-              src={offers[currentIndex].headshot}
-              alt="Ryan Headshot"
-            />
-            <div className="spacedFlexColumn">
-              <div>
-                <p>Price Listed: {offers[currentIndex].priceListed}</p>
-                <p>Price Offered: {offers[currentIndex].priceOffered}</p>
-              </div>
-              <div>
-                <p>Status:</p>
-                <p id="fbstatus">{offers[currentIndex].status}</p>
+      {!isMinimized && (
+        <>
+          <div className="carousel">
+            <button onClick={handlePrev} className="carouselButton">
+              <ChevronLeft size={18} />
+            </button>
+            <div className="carouselContent">
+              <div className="normFlex">
+                <img
+                  id="ryanheadshot"
+                  src={offers[currentIndex].headshot}
+                  alt="Ryan Headshot"
+                />
+                <div className="spacedFlexColumn">
+                  <div className="priceSection">
+                    <p className="priceLabel">Listed:</p>
+                    <p className="priceValue">${offers[currentIndex].priceListed}</p>
+                  </div>
+                  <div className="priceSection">
+                    <p className="priceLabel">Offered:</p>
+                    <p className="priceValue">${offers[currentIndex].priceOffered}</p>
+                  </div>
+                  <div className="statusSection">
+                    <p className="statusLabel">Status:</p>
+                    <p className={`statusBadge status-${offers[currentIndex].statusColor}`}>
+                      {offers[currentIndex].status}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
+            <button onClick={handleNext} className="carouselButton">
+              <ChevronRight size={18} />
+            </button>
           </div>
 
-          <div className="carouselCounter">
-            {currentIndex + 1} / {offers.length}
+          <div className="carouselProgress">
+            {offers.map((_, index) => (
+              <div
+                key={index}
+                className={`progressDot ${index === currentIndex ? 'active' : ''}`}
+              />
+            ))}
           </div>
-        </div>
-      </div>
-      <button onClick={handleNext} className="carouselButton">›</button>
+        </>
+      )}
     </div>
   );
 }

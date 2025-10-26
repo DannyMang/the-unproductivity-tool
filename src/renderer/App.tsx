@@ -285,18 +285,38 @@ function Home() {
           </button>
         </a>
       </div>
-      <FbWidget></FbWidget>
-      <DoordashWidget></DoordashWidget>
     </div>
   );
 }
 
 export default function App() {
+  const [isFbWidgetMinimized, setIsFbWidgetMinimized] = useState(false);
+  const [isDoordashWidgetMinimized, setIsDoordashWidgetMinimized] = useState(false);
+
+  const toggleFbWidget = () => {
+    setIsFbWidgetMinimized(!isFbWidgetMinimized);
+  };
+
+  const toggleDoordashWidget = () => {
+    setIsDoordashWidgetMinimized(!isDoordashWidgetMinimized);
+  };
+
   return (
     <>
       <DistractionOverlay />
       <Router>
         <GlassyNavbar />
+        {/* Fixed positioned widgets container */}
+        <div className="widgets-container">
+          <FbWidget
+            isMinimized={isFbWidgetMinimized}
+            onMinimizeToggle={toggleFbWidget}
+          />
+          <DoordashWidget
+            isMinimized={isDoordashWidgetMinimized}
+            onMinimizeToggle={toggleDoordashWidget}
+          />
+        </div>
         <Routes>
           <Route path="/" element={<Home />} />
 

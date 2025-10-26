@@ -1,16 +1,92 @@
 .widgetContainer {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 2vw;
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 20px;
-    width: 700px;
-    min-width: 700px;
-    max-width: 700px;
-    margin: 10px;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    padding: 16px;
+    width: 480px;
+    min-width: 480px;
+    max-width: 480px;
+    margin: 1px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.widgetContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent
+    );
+}
+
+.widgetContainer {
+    animation: slideInFade 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInFade {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.widgetContainer.minimized {
+    width: auto;
+    min-width: auto;
+    max-width: auto;
+}
+
+.widgetHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.hideButton {
+    background: transparent;
+    border: none;
+    color: #1a1a1a;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Neue Montreal', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: lowercase;
+    letter-spacing: 0.5px;
+}
+
+.hideButton:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(1.05);
+}
+
+.hideButton:active {
+    transform: scale(0.95);
 }
 
 .spacedFlex {
@@ -22,7 +98,68 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 4vw;
+    gap: 1vw;
+}
+
+.priceSection {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.priceLabel {
+    font-size: 10px;
+    color: #888;
+    font-weight: 400;
+    margin: 0;
+}
+
+.priceValue {
+    font-size: 14px;
+    color: #1a1a1a;
+    font-weight: 600;
+    margin: 0;
+}
+
+.statusSection {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.statusLabel {
+    font-size: 10px;
+    color: #888;
+    font-weight: 400;
+    margin: 0;
+}
+
+.statusBadge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 9px;
+    font-weight: 500;
+    font-family: 'Neue Montreal', sans-serif;
+    margin: 0;
+}
+
+.status-orange {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.status-green {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-yellow {
+    background: rgba(255, 235, 59, 0.15);
+    color: #ffc107;
+    border: 1px solid rgba(255, 235, 59, 0.3);
 }
 
 .normFlex {
@@ -30,7 +167,7 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 1vw;
+    gap: 0.6vw;
 }
 
 .bottomAlign {
@@ -42,44 +179,70 @@
 }
 
 #fbicon {
-    border-radius: 8px;
-    height: 4.5vw;
+    border-radius: 6px;
+    height: 2.8vw;
 }
 
 #ryanheadshot {
     border-radius: 8px;
-    height: 10vw;
-    width: 10vw;
+    height: 6vw;
+    width: 6vw;
     object-fit: cover;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#ryanheadshot:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 
 h2 {
-    margin-top: 0;
-    margin-bottom: 0;
+    font-family: 'Neue Montreal', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: #1a1a1a;
+    margin: 0 0 2px 0;
 }
 
 p {
-    margin-top: 2px;
-    margin-bottom: 2px;
+    font-family: 'Neue Montreal', sans-serif;
+    font-size: 11px;
+    color: #666;
+    margin: 1px 0;
 }
 
 #fbstatus{
     display: inline-block;
-    background-color: greenyellow;
-    color: green;
+    background: rgba(76, 175, 80, 0.15);
+    color: #4CAF50;
     border-radius: 100px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 2px 8px;
+    font-family: 'Neue Montreal', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
 .carouselButton {
     background: transparent;
     border: none;
-    font-size: 24px;
+    border-radius: 50%;
     color: white;
     cursor: pointer;
-    padding: 10px;
+    padding: 6px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.carouselButton:hover {
+    transform: scale(1.1);
+    opacity: 0.7;
 }
 
 .carousel {
@@ -87,12 +250,51 @@ p {
     align-items: center;
     justify-content: center;
     width: 100%;
-    gap: 2vw;
+    gap: 1vw;
+    margin-top: 12px;
+    position: relative;
+}
+
+.carouselContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 1vw;
+    transition: opacity 0.3s ease;
+}
+
+.carouselProgress {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.progressDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.progressDot:hover {
+    background: rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+}
+
+.progressDot.active {
+    background: rgba(0, 0, 0, 0.5);
+    transform: scale(1.2);
 }
 
 .carouselCounter {
-    color: white;
-    font-size: 14px;
-    margin-top: 10px;
+    color: #666;
+    font-family: 'Neue Montreal', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    margin-top: 4px;
     text-align: center;
 }
