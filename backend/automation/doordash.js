@@ -28,7 +28,6 @@ async function orderBeer({
   // Launch browser (visible for debugging, headless for production)
   const browser = await puppeteer.launch({
     headless: process.env.BROWSER_HEADLESS !== 'false',
-    slowMo: 50, // Slow down for visibility
     // Use a persistent user data directory to save login sessions
     userDataDir: './puppeteer-data',
     args: [
@@ -70,12 +69,12 @@ async function orderBeer({
     // Navigate to DoorDash
     console.log(`[${orderId}] Navigating to DoorDash...`);
     await page.goto('https://www.doordash.com', {
-      waitUntil: 'networkidle2',
+      waitUntil: 'domcontentloaded',
       timeout: 30000,
     });
 
     // Wait for page to load
-    await wait(2000);
+    await wait(500);
 
     // Check if logged in and wait if not
     console.log(`[${orderId}] Checking login status...`);
@@ -165,10 +164,10 @@ async function orderBeer({
           console.log(`[${orderId}] Going back to try another store...`);
           // Navigate back to the alcohol section page
           await page.goto(alcoholPageUrl, {
-            waitUntil: 'networkidle2',
+            waitUntil: 'domcontentloaded',
             timeout: 30000,
           });
-          await wait(2000);
+          await wait(800);
         } else {
           throw new Error(
             `Failed to add items after trying ${maxStoreAttempts} stores`,
@@ -225,7 +224,7 @@ async function clearCart(page, orderId) {
     const cartButton = await page.$('[data-testid="OrderCartIconButton"]');
     if (cartButton) {
       await cartButton.click();
-      await wait(3000);
+      await wait(1000);
 
       // Look for and click "Clear cart" or delete buttons
       // First try to find a "clear all" type button
@@ -272,7 +271,7 @@ async function clearCart(page, orderId) {
 
       if (cleared.clicked && cleared.type === 'clear_all') {
         console.log(`[${orderId}] Clicked "clear all" button, waiting for confirmation...`);
-        await wait(1500);
+        await wait(500);
 
         // Handle potential confirmation dialog
         const confirmed = await page.evaluate(() => {
@@ -300,7 +299,7 @@ async function clearCart(page, orderId) {
 
         if (confirmed) {
           console.log(`[${orderId}] ✓ Confirmed cart deletion`);
-          await wait(1000);
+          await wait(500);
         }
 
         console.log(`[${orderId}] ✓ Cart cleared`);
@@ -331,7 +330,7 @@ async function clearCart(page, orderId) {
 
           if (deleted) {
             console.log(`[${orderId}] ✓ Deleted item ${i + 1}/${cleared.deleteCount}`);
-            await wait(800);
+            await wait(400);
           } else {
             console.log(`[${orderId}] Could not find delete button for item ${i + 1}`);
             break;
@@ -345,7 +344,7 @@ async function clearCart(page, orderId) {
 
       // Close cart
       await page.keyboard.press('Escape');
-      await wait(1000);
+      await wait(500);
     }
   } catch (error) {
     console.log(
@@ -359,7 +358,7 @@ async function clearCart(page, orderId) {
  */
 async function checkLoginStatus(page) {
   try {
-    await wait(1000);
+    await wait(300);
 
     try {
       const isLoggedIn = await page.evaluate(() => {
@@ -500,12 +499,12 @@ async function setDeliveryAddress(page, address, orderId) {
     await page.keyboard.press('Backspace');
 
     // Type new address
-    await addressInput.type(address, { delay: 50 });
-    await wait(1000);
+    await addressInput.type(address, { delay: 30 });
+    await wait(500);
 
     // Press Enter or click first suggestion
     await page.keyboard.press('Enter');
-    await wait(2000);
+    await wait(1000);
 
     console.log(`[${orderId}] ✓ Address set successfully`);
   } catch (error) {
@@ -540,10 +539,7 @@ async function navigateToAlcohol(page, orderId) {
     console.log(`[${orderId}] Navigating to Alcohol section: ${alcoholUrl}`);
 
     // Navigate to the alcohol page
-    await page.goto(alcoholUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-
-    // Wait for page to load
-    await wait(3000);
+    await page.goto(alcoholUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Wait for store cards to appear
     try {
@@ -610,10 +606,10 @@ async function selectLiquorStore(page, orderId, storeIndex = 1) {
 
     // Navigate directly to the store URL instead of clicking
     const storeUrl = storeLinks[targetIndex].href;
-    await page.goto(storeUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(storeUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Wait for page to load
-    await wait(3000);
+    await wait(800);
 
     // Verify we're on a store page
     const currentUrl = page.url();
@@ -634,7 +630,7 @@ async function selectLiquorStore(page, orderId, storeIndex = 1) {
  */
 async function addItemsToCart(page, beerPreference, quantity, orderId) {
   try {
-    await wait(2000);
+    await wait(500);
 
     // Search for beer in the store
     const storeSearch = await page.$('input[placeholder*="Search"]');
@@ -645,9 +641,9 @@ async function addItemsToCart(page, beerPreference, quantity, orderId) {
           ? `${beerPreference} beer 6 pack`
           : 'beer 6 pack';
       console.log(`[${orderId}] Searching for: ${searchTerm}`);
-      await storeSearch.type(searchTerm, { delay: 100 });
+      await storeSearch.type(searchTerm, { delay: 50 });
       await page.keyboard.press('Enter');
-      await wait(3000);
+      await wait(1500);
     } else {
       console.log(
         `[${orderId}] No search box found, browsing all products...`,
@@ -722,7 +718,7 @@ async function addItemsToCart(page, beerPreference, quantity, orderId) {
       if (clicked) {
         itemsAdded++;
         console.log(`[${orderId}] ✓ Added item ${itemsAdded}: ${clicked}`);
-        await wait(1500);
+        await wait(500);
       } else {
         console.warn(`[${orderId}] Could not click Add button ${i + 1}`);
       }
@@ -764,7 +760,7 @@ async function completeOrder(orderSession) {
 
     if (cartButton) {
       await cartButton.click();
-      await wait(2000);
+      await wait(1000);
     }
 
     // Click checkout
@@ -798,7 +794,7 @@ async function completeOrder(orderSession) {
 
     if (checkoutButton) {
       await checkoutButton.click();
-      await wait(3000);
+      await wait(1500);
     }
 
     // NOTE: We stop here before actually placing the order to avoid real charges
