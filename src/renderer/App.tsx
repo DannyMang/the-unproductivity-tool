@@ -4,6 +4,8 @@ import './App.css';
 import triggerRandomDistraction from './utils/distractions';
 import icon from '../../assets/icon.png';
 
+import FbWidget from './components/FbWidget';
+import DoordashWidget from './components/doordash/DoordashWidget';
 // Components
 import GlassyNavbar from './components/GlassyNavbar';
 
@@ -288,11 +290,33 @@ function Home() {
 }
 
 export default function App() {
+  const [isFbWidgetMinimized, setIsFbWidgetMinimized] = useState(false);
+  const [isDoordashWidgetMinimized, setIsDoordashWidgetMinimized] = useState(false);
+
+  const toggleFbWidget = () => {
+    setIsFbWidgetMinimized(!isFbWidgetMinimized);
+  };
+
+  const toggleDoordashWidget = () => {
+    setIsDoordashWidgetMinimized(!isDoordashWidgetMinimized);
+  };
+
   return (
     <>
       <DistractionOverlay />
       <Router>
         <GlassyNavbar />
+        {/* Fixed positioned widgets container */}
+        <div className="widgets-container">
+          <FbWidget
+            isMinimized={isFbWidgetMinimized}
+            onMinimizeToggle={toggleFbWidget}
+          />
+          <DoordashWidget
+            isMinimized={isDoordashWidgetMinimized}
+            onMinimizeToggle={toggleDoordashWidget}
+          />
+        </div>
         <Routes>
           <Route path="/" element={<Home />} />
 
