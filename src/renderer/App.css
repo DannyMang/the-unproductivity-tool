@@ -5,30 +5,37 @@
 
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Regular.woff' format('woff2');
+  src: url('../../assets/fonts/Neue Montreal - woff/NeueMontreal-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Italic.woff' format('woff2');
+  src: url('../../assets/fonts/Neue Montreal - woff/NeueMontreal-Italic.woff') format('woff');
   font-weight: normal;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-Bold.woff' format('woff2');
+  src: url('../../assets/fonts/Neue Montreal - woff/NeueMontreal-Bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Neue Montreal';
-  src: 'my-electron-app/assets/fonts/Neue Montreal - woff/NeueMontreal-BoldItalic.woff' format('woff2');
+  src: url('../../assets/fonts/Neue Montreal - woff/NeueMontreal-BoldItalic.woff') format('woff');
   font-weight: bold;
   font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('../../assets/fonts/Neue Montreal - woff/NeueMontreal-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -48,11 +55,8 @@ p {
   font-family: 'Neue Montreal';
 }
 
-
-
 body {
   position: relative;
-  color: white;
   height: 100vh;
   background: linear-gradient(
     200.96deg,
@@ -67,44 +71,263 @@ body {
   align-items: center;
 }
 
-button {
-  background-color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  appearance: none;
-  font-size: 1.3rem;
-  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
-    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
-  transition: all ease-in 0.1s;
+/* Completely invisible overlay - non-intrusive */
+.invisible-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Container for distraction elements */
+#distraction-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Debug: Add a visible border for testing */
+  border: 2px dashed red;
+  background: rgba(255, 255, 0, 0.1);
+}
+
+/* Closable distraction popups */
+.distraction-popup {
+  position: absolute;
+  background: rgba(255, 0, 100, 0.9);
+  color: white;
+  padding: 20px;
+  padding-right: 40px;
+  border-radius: 15px;
+  font-family: 'Comic Sans MS', cursive;
+  font-size: 24px;
+  font-weight: bold;
+  pointer-events: auto;
+  animation: shake 0.5s infinite;
+  z-index: 1000000;
+  box-shadow: 0 0 30px rgba(255, 0, 100, 0.8);
   cursor: pointer;
-  opacity: 0.9;
 }
 
-button:hover {
-  transform: scale(1.05);
-  opacity: 1;
-}
-
-li {
-  list-style: none;
-}
-
-a {
-  text-decoration: none;
-  height: fit-content;
-  width: fit-content;
-  margin: 10px;
-}
-
-a:hover {
-  opacity: 1;
-  text-decoration: none;
-}
-
-.Hello {
+.distraction-popup::before {
+  content: '×';
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 20px 0;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+/* Distraction animations */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateX(10px) rotate(5deg);
+  }
+}
+
+@keyframes rainbow {
+  0% {
+    background: linear-gradient(
+      45deg,
+      #ff0000,
+      #ff7f00,
+      #ffff00,
+      #00ff00,
+      #0000ff,
+      #4b0082,
+      #9400d3
+    );
+  }
+  100% {
+    background: linear-gradient(
+      45deg,
+      #9400d3,
+      #4b0082,
+      #0000ff,
+      #00ff00,
+      #ffff00,
+      #ff7f00,
+      #ff0000
+    );
+  }
+}
+
+.rainbow-distraction {
+  animation: rainbow 2s linear infinite;
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Flying distraction elements */
+.flying-element {
+  position: absolute;
+  font-size: 36px;
+  pointer-events: none;
+  animation: fly-across-screen 10s linear infinite;
+}
+
+@keyframes fly-across-screen {
+  0% {
+    left: -100px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+  }
+  100% {
+    left: calc(100% + 100px);
+    top: 50%;
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* Flashing overlay distraction */
+.flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 0, 0.3);
+  pointer-events: none;
+  animation: flash 0.2s ease-in-out;
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Game Widget Distraction Styles */
+.game-widget-distraction {
+  position: absolute;
+  width: 600px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  pointer-events: auto;
+  z-index: 1000001;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: widgetAppear 0.3s ease-out;
+  cursor: move;
+}
+
+@keyframes widgetAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.game-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: move;
+}
+
+.game-widget-title {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: 'Neue Montreal', sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-widget-close {
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 0, 0, 0.3);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  font-family: 'Neue Montreal', sans-serif;
+}
+
+.game-widget-close:hover {
+  background: rgba(255, 0, 0, 0.5);
+  transform: scale(1.1);
+}
+
+.game-widget-content {
+  padding: 20px;
+  height: calc(100% - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-widget-preview {
+  text-align: center;
+  color: white;
+  font-family: 'Neue Montreal', sans-serif;
+}
+
+.game-widget-preview h3 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-widget-preview p {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.game-widget-placeholder {
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.game-widget-emoji {
+  font-size: 48px;
+  opacity: 0.7;
 }
