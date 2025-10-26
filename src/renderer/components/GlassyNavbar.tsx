@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Bird, Club, Keyboard, Worm, ShoppingCart, Store, Zap } from 'lucide-react';
 import './GlassyNavbar.css';
 import Logo from '../../../assets/images/theunproductivitytoollogo.png';
+import DoorDashAPI, { DoorDashOrderRequest } from '../services/api';
 
 // Timeout management constants (matching App.tsx)
 const COOLDOWN_PERIOD = 60 * 1000; // 1 minute in milliseconds
@@ -138,14 +139,21 @@ interface NavItem {
     isGame?: boolean;
     gameName?: string;
     gameEmoji?: string;
+    isWidget?: boolean;
   }[];
 }
 
-function GlassyNavbar() {
+interface GlassyNavbarProps {
+  onShowFbLowballWidget: () => void;
+}
+
+function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   const [canTest, setCanTest] = useState(true);
+  const [isOrdering, setIsOrdering] = useState(false);
+  const [orderNotification, setOrderNotification] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
   const location = useLocation();
 
@@ -213,16 +221,54 @@ function GlassyNavbar() {
           path: '/automation/doordash-order',
           description: 'Auto-place a saved order.',
           icon: <ShoppingCart size={20} />,
+          isWidget: true,
         },
         {
           label: 'Facebook Marketplace',
           path: '/automation/facebook-marketplace',
           description: 'Search & watch listings.',
           icon: <Store size={20} />,
+          isWidget: true,
         },
       ],
     },
   ];
+
+  const handleDoorDashOrder = async () => {
+    if (isOrdering) return;
+
+    setIsOrdering(true);
+    setOrderNotification(null);
+
+    try {
+      const orderRequest: DoorDashOrderRequest = {
+        // You can add default values here or get them from user preferences
+        quantity: 6,
+        beerPreference: 'Any',
+        scheduleTime: 'now'
+      };
+
+      const response = await DoorDashAPI.placeOrder(orderRequest);
+
+      if (response.success) {
+        setOrderNotification(`🎉 Order placed! Order ID: ${response.orderId}. You have ${response.cancelWindowSeconds}s to cancel.`);
+      } else {
+        setOrderNotification(`❌ Order failed: ${response.error}`);
+      }
+    } catch (error) {
+      console.error('DoorDash order error:', error);
+      setOrderNotification(`❌ Order failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsOrdering(false);
+      // Clear notification after 5 seconds
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        setOrderNotification(null);
+      }, 5000);
+    }
+  };
 
   const clearDropdownTimeout = () => {
     if (timeoutRef.current) {
@@ -275,6 +321,16 @@ function GlassyNavbar() {
 
   const handleGameClick = (gameName: string, gameEmoji: string) => {
     createGameWidget(gameName, gameEmoji);
+    setActiveDropdown(null);
+  };
+
+  const handleDoorDashClick = () => {
+    handleDoorDashOrder();
+    setActiveDropdown(null);
+  };
+
+  const handleFbMarketplaceClick = () => {
+    onShowFbLowballWidget();
     setActiveDropdown(null);
   };
 
@@ -388,6 +444,41 @@ function GlassyNavbar() {
                         );
                       }
 
+                      if (subItem.isWidget) {
+                        const handleClick = subItem.label === 'Doordash Order'
+                          ? handleDoorDashClick
+                          : handleFbMarketplaceClick;
+
+                        return (
+                          <button
+                            type="button"
+                            key={subItem.path}
+                            className="mega-menu-card"
+                            onClick={handleClick}
+                            role="menuitem"
+                            tabIndex={isKeyboardMode ? 0 : -1}
+                            disabled={subItem.label === 'Doordash Order' && isOrdering}
+                          >
+                            <div className="card-icon lucide-icon">
+                              {subItem.icon}
+                            </div>
+                            <div className="card-content">
+                              <div className="card-title">
+                                {subItem.label}
+                                {subItem.label === 'Doordash Order' && isOrdering && (
+                                  <span style={{ marginLeft: '8px', fontSize: '12px', color: '#10b981' }}>
+                                    Placing order...
+                                  </span>
+                                )}
+                              </div>
+                              <div className="card-description">
+                                {subItem.description}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      }
+
                       return (
                         <Link
                           key={subItem.path}
@@ -415,6 +506,33 @@ function GlassyNavbar() {
             </div>
           ))}
         </div>
+
+        {/* Order Status Display */}
+        {orderNotification && (
+          <div className="navbar-notification">
+            <div
+              style={{
+                backgroundColor: orderNotification.includes('🎉') ? '#10b981' : '#ef4444',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                fontSize: '13px',
+                fontWeight: '500',
+                opacity: 0.95,
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                minWidth: '200px',
+                maxWidth: '300px',
+                justifyContent: 'center',
+                animation: 'slideIn 0.3s ease-out',
+              }}
+            >
+              {orderNotification}
+            </div>
+          </div>
+        )}
 
         {/* Cooldown Status Display */}
         <div className="navbar-cooldown">

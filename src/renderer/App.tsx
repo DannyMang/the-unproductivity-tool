@@ -7,6 +7,7 @@ import icon from '../../assets/icon.png';
 
 import FbWidget from './components/FbWidget';
 import DoordashWidget from './components/doordash/DoordashWidget';
+import FbLowballWidget from './components/FbLowballWidget';
 // Components
 import GlassyNavbar from './components/GlassyNavbar';
 
@@ -206,6 +207,7 @@ export default function App() {
   const [isFbWidgetMinimized, setIsFbWidgetMinimized] = useState(false);
   const [isDoordashWidgetMinimized, setIsDoordashWidgetMinimized] =
     useState(false);
+  const [showFbLowballWidget, setShowFbLowballWidget] = useState(false);
 
   const toggleFbWidget = () => {
     setIsFbWidgetMinimized(!isFbWidgetMinimized);
@@ -215,11 +217,15 @@ export default function App() {
     setIsDoordashWidgetMinimized(!isDoordashWidgetMinimized);
   };
 
+  const handleShowFbLowballWidget = () => {
+    setShowFbLowballWidget(true);
+  };
+
   return (
     <>
       <DistractionOverlay />
       <Router>
-        <GlassyNavbar />
+        <GlassyNavbar onShowFbLowballWidget={handleShowFbLowballWidget} />
         {/* Fixed positioned widgets container */}
         <div className="widgets-container">
           <FbWidget
@@ -254,6 +260,12 @@ export default function App() {
           />
         </Routes>
       </Router>
+
+      {/* Facebook Lowball Widget */}
+      <FbLowballWidget
+        isVisible={showFbLowballWidget}
+        onClose={() => setShowFbLowballWidget(false)}
+      />
     </>
   );
 }
