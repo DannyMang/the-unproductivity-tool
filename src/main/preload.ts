@@ -2,7 +2,10 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent, shell } from 'electron';
 
-export type Channels = 'ipc-example' | 'START_MONITORING' | 'TRIGGER_DISTRACTION';
+export type Channels =
+  | 'ipc-example'
+  | 'START_MONITORING'
+  | 'TRIGGER_DISTRACTION';
 
 const electronAPI = {
   send: (channel: Channels, ...args: unknown[]) => {
@@ -22,7 +25,7 @@ const electronAPI = {
   },
   openExternal: (url: string) => {
     shell.openExternal(url);
-  }
+  },
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

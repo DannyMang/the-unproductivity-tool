@@ -53,20 +53,20 @@ if (!gotTheLock) {
 
   // Application detection system
   const TARGET_APPLICATIONS = [
-    'Code',        // VS Code
-    'Terminal',    // Terminal
-    'iTerm',       // iTerm2
+    'Code', // VS Code
+    'Terminal', // Terminal
+    'iTerm', // iTerm2
     'Sublime Text', // Sublime Text
-    'Atom',        // Atom editor
-    'WebStorm',    // JetBrains IDEs
-    'IntelliJ',    // IntelliJ IDEA
-    'PyCharm',     // PyCharm
-    'Xcode',       // Xcode
+    'Atom', // Atom editor
+    'WebStorm', // JetBrains IDEs
+    'IntelliJ', // IntelliJ IDEA
+    'PyCharm', // PyCharm
+    'Xcode', // Xcode
     'Visual Studio', // Visual Studio
-    'Figma',       // Figma
-    'Slack',       // Slack
-    'Notion',      // Notion
-    'Spotify',     // Spotify
+    'Figma', // Figma
+    'Slack', // Slack
+    'Notion', // Notion
+    'Spotify', // Spotify
   ];
 
   let monitoringInterval: NodeJS.Timeout | null = null;
@@ -85,39 +85,66 @@ if (!gotTheLock) {
     monitoringInterval = setInterval(() => {
       if (process.platform === 'darwin') {
         // macOS: use AppleScript to get frontmost application
-        exec(`osascript -e 'tell application "System Events" to get name of first process whose frontmost is true'`, (error: any, stdout: string) => {
-          const appName = stdout.trim();
-          console.log('Current app:', appName);
+        exec(
+          `osascript -e 'tell application "System Events" to get name of first process whose frontmost is true'`,
+          (error: any, stdout: string) => {
+            const appName = stdout.trim();
+            console.log('Current app:', appName);
 
-          if (TARGET_APPLICATIONS.some(target => appName.toLowerCase().includes(target.toLowerCase()))) {
-            console.log('DETECTED TARGET APPLICATION:', appName);
-            // Trigger distraction
-            console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
-            event.sender.send('TRIGGER_DISTRACTION', {
-              type: 'app_detected',
-              app: appName,
-              message: 'STOP WORKING! HAVE SOME FUN INSTEAD! 🎉'
-            });
-            console.log('TRIGGER_DISTRACTION event sent successfully');
-          }
-        });
+            if (
+              appName &&
+              TARGET_APPLICATIONS.some((target) =>
+                appName.toLowerCase().includes(target.toLowerCase()),
+              )
+            ) {
+              console.log('DETECTED TARGET APPLICATION:', appName);
+              // Trigger distraction
+              console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
+              const distractionData = {
+                type: 'app_detected',
+                app: appName,
+                message: 'STOP WORKING! HAVE SOME FUN INSTEAD! 🎉',
+              };
+              console.log('Distraction data to send:', distractionData);
+
+              // Ensure we have a valid webContents before sending
+              if (event && event.sender) {
+                event.sender.send('TRIGGER_DISTRACTION', distractionData);
+                console.log('TRIGGER_DISTRACTION event sent successfully');
+              } else {
+                console.error(
+                  'Cannot send TRIGGER_DISTRACTION: event or event.sender is null',
+                );
+              }
+            }
+          },
+        );
       } else if (process.platform === 'win32') {
         // Windows: use PowerShell to get active window
-        exec('powershell "Get-Process | Where-Object {$_.MainWindowTitle -ne \\""} | Select-Object ProcessName, MainWindowTitle | Sort-Object CPU -Descending | Select-Object -First 1"', (error: any, stdout: string) => {
-          const output = stdout.trim();
-          console.log('Current app:', output);
+        exec(
+          'powershell "Get-Process | Where-Object {$_.MainWindowTitle -ne \\""} | Select-Object ProcessName, MainWindowTitle | Sort-Object CPU -Descending | Select-Object -First 1"',
+          (error: any, stdout: string) => {
+            const output = stdout.trim();
+            console.log('Current app:', output);
 
-          if (TARGET_APPLICATIONS.some(target => output.toLowerCase().includes(target.toLowerCase()))) {
-            console.log('DETECTED TARGET APPLICATION:', output);
-            console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
-            event.sender.send('TRIGGER_DISTRACTION', {
-              type: 'app_detected',
-              app: output,
-              message: 'TIME FOR A BREAK! 🎮'
-            });
-            console.log('TRIGGER_DISTRACTION event sent successfully');
-          }
-        });
+            if (
+              TARGET_APPLICATIONS.some((target) =>
+                output.toLowerCase().includes(target.toLowerCase()),
+              )
+            ) {
+              console.log('DETECTED TARGET APPLICATION:', output);
+              console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
+              const distractionData = {
+                type: 'app_detected',
+                app: output,
+                message: 'TIME FOR A BREAK! 🎮',
+              };
+              console.log('Distraction data to send:', distractionData);
+              event.sender.send('TRIGGER_DISTRACTION', distractionData);
+              console.log('TRIGGER_DISTRACTION event sent successfully');
+            }
+          },
+        );
       }
     }, 2000); // Check every 2 seconds
   }
@@ -167,7 +194,8 @@ if (!gotTheLock) {
     // Get screen dimensions
     const { screen } = require('electron');
     const primaryDisplay = screen.getPrimaryDisplay();
-    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+    const { width: screenWidth, height: screenHeight } =
+      primaryDisplay.workAreaSize;
 
     console.log('Screen dimensions:', { screenWidth, screenHeight });
 
@@ -193,6 +221,8 @@ if (!gotTheLock) {
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: false,
+        enableRemoteModule: false,
+        webSecurity: true,
       },
     });
 
@@ -216,13 +246,28 @@ if (!gotTheLock) {
       mainWindow = null;
     });
 
-    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
-      console.error('Failed to load URL:', { errorCode, errorDescription, validatedURL });
-    });
+    mainWindow.webContents.on(
+      'did-fail-load',
+      (event, errorCode, errorDescription, validatedURL) => {
+        console.error('Failed to load URL:', {
+          errorCode,
+          errorDescription,
+          validatedURL,
+        });
+      },
+    );
 
     mainWindow.webContents.on('did-finish-load', () => {
       console.log('Page loaded successfully');
     });
+
+    // Handle console messages from renderer
+    mainWindow.webContents.on(
+      'console-message',
+      (event, level, message, line, sourceId) => {
+        console.log(`[Renderer Console] ${level}: ${message}`);
+      },
+    );
 
     const menuBuilder = new MenuBuilder(mainWindow);
     menuBuilder.buildMenu();

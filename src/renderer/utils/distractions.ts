@@ -34,8 +34,8 @@ const createDistractionPopup = (distractionContainerRef) => {
   console.log('Popup message:', popup.textContent);
   console.log('Window dimensions:', window.innerWidth, window.innerHeight);
 
-  popup.style.left = Math.random() * (window.innerWidth - 300) + 'px';
-  popup.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+  popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
+  popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
 
   console.log('Popup position:', popup.style.left, popup.style.top);
 
@@ -48,12 +48,15 @@ const createDistractionPopup = (distractionContainerRef) => {
     } else {
       console.log('Popup moved to new position');
       // Move the popup when clicked on the main area
-      popup.style.left = Math.random() * (window.innerWidth - 300) + 'px';
-      popup.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+      popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
+      popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
     }
   };
 
-  console.log('About to append popup to container:', distractionContainerRef.current);
+  console.log(
+    'About to append popup to container:',
+    distractionContainerRef.current,
+  );
   distractionContainerRef.current?.appendChild(popup);
   console.log('Popup appended to DOM');
 
@@ -76,8 +79,8 @@ const openDistractionWebsite = () => {
 const createRainbowDistraction = (distractionContainerRef) => {
   const rainbow = document.createElement('div');
   rainbow.className = 'rainbow-distraction';
-  rainbow.style.left = Math.random() * (window.innerWidth - 200) + 'px';
-  rainbow.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+  rainbow.style.left = `${Math.random() * (window.innerWidth - 200)}px`;
+  rainbow.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
 
   distractionContainerRef.current?.appendChild(rainbow);
 
@@ -93,8 +96,8 @@ const createFlyingElements = (distractionContainerRef) => {
       element.className = 'flying-element';
       element.textContent =
         elements[Math.floor(Math.random() * elements.length)];
-      element.style.top = Math.random() * window.innerHeight + 'px';
-      element.style.animationDelay = i * 0.5 + 's';
+      element.style.top = `${Math.random() * window.innerHeight}px`;
+      element.style.animationDelay = `${i * 0.5}s`;
 
       distractionContainerRef.current?.appendChild(element);
 
@@ -123,7 +126,10 @@ const flashScreen = (distractionContainerRef) => {
 };
 const triggerRandomDistraction = (distractionContainerRef) => {
   console.log('triggerRandomDistraction called with:', distractionContainerRef);
-  console.log('distractionContainerRef.current:', distractionContainerRef?.current);
+  console.log(
+    'distractionContainerRef.current:',
+    distractionContainerRef?.current,
+  );
 
   const distractionType = Math.floor(Math.random() * 5);
   console.log('Selected distraction type:', distractionType);

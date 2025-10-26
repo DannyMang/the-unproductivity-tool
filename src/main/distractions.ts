@@ -15,7 +15,7 @@ const DISTRACTION_URLS = [
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://www.reddit.com/r/amitheasshole',
   'https://www.tiktok.com',
-  'https://twitter.com/explore',
+  'https://x.com',
   'https://www.instagram.com/explore',
   'https://www.youtube.com/watch?v=jNQXAC9IVRw',
   'https://www.netflix.com',
@@ -28,8 +28,8 @@ const createDistractionPopup = (distractionContainerRef) => {
     DISTRACTION_MESSAGES[
       Math.floor(Math.random() * DISTRACTION_MESSAGES.length)
     ];
-  popup.style.left = Math.random() * (window.innerWidth - 300) + 'px';
-  popup.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+  popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
+  popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
 
   popup.onclick = (e) => {
     // Check if clicked on the X button (right side)
@@ -37,8 +37,8 @@ const createDistractionPopup = (distractionContainerRef) => {
       popup.remove();
     } else {
       // Move the popup when clicked on the main area
-      popup.style.left = Math.random() * (window.innerWidth - 300) + 'px';
-      popup.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+      popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
+      popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
     }
   };
 
@@ -61,8 +61,8 @@ const openDistractionWebsite = () => {
 const createRainbowDistraction = (distractionContainerRef) => {
   const rainbow = document.createElement('div');
   rainbow.className = 'rainbow-distraction';
-  rainbow.style.left = Math.random() * (window.innerWidth - 200) + 'px';
-  rainbow.style.top = Math.random() * (window.innerHeight - 200) + 'px';
+  rainbow.style.left = `${Math.random() * (window.innerWidth - 200)}px`;
+  rainbow.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
 
   distractionContainerRef.current?.appendChild(rainbow);
 
@@ -78,8 +78,8 @@ const createFlyingElements = (distractionContainerRef) => {
       element.className = 'flying-element';
       element.textContent =
         elements[Math.floor(Math.random() * elements.length)];
-      element.style.top = Math.random() * window.innerHeight + 'px';
-      element.style.animationDelay = i * 0.5 + 's';
+      element.style.top = `${Math.random() * window.innerHeight}px`;
+      element.style.animationDelay = `${i * 0.5}s`;
 
       distractionContainerRef.current?.appendChild(element);
 
