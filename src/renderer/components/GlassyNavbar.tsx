@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bird, Club, Keyboard, Worm, ShoppingCart, Store, Zap } from 'lucide-react';
+import {
+  Bird,
+  Club,
+  Keyboard,
+  Worm,
+  ShoppingCart,
+  Store,
+  Zap,
+} from 'lucide-react';
 import './GlassyNavbar.css';
 import Logo from '../../../assets/images/theunproductivitytoollogo.png';
 import DoorDashAPI, { DoorDashOrderRequest } from '../services/api';
@@ -153,7 +161,9 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
   const [remainingCooldown, setRemainingCooldown] = useState(0);
   const [canTest, setCanTest] = useState(true);
   const [isOrdering, setIsOrdering] = useState(false);
-  const [orderNotification, setOrderNotification] = useState<string | null>(null);
+  const [orderNotification, setOrderNotification] = useState<string | null>(
+    null,
+  );
   const timeoutRef = useRef<number | null>(null);
   const location = useLocation();
 
@@ -245,19 +255,23 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
         // You can add default values here or get them from user preferences
         quantity: 6,
         beerPreference: 'Any',
-        scheduleTime: 'now'
+        scheduleTime: 'now',
       };
 
       const response = await DoorDashAPI.placeOrder(orderRequest);
 
       if (response.success) {
-        setOrderNotification(`🎉 Order placed! Order ID: ${response.orderId}. You have ${response.cancelWindowSeconds}s to cancel.`);
+        setOrderNotification(
+          `🎉 Order placed! Order ID: ${response.orderId}. You have ${response.cancelWindowSeconds}s to cancel.`,
+        );
       } else {
         setOrderNotification(`❌ Order failed: ${response.error}`);
       }
     } catch (error) {
       console.error('DoorDash order error:', error);
-      setOrderNotification(`❌ Order failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setOrderNotification(
+        `❌ Order failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     } finally {
       setIsOrdering(false);
       // Clear notification after 5 seconds
@@ -369,7 +383,7 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
           <Link to="/">
             <div className="logoFlex">
               <img id="logo" src={Logo}></img>
-              <h1>The Unproductivity Tool</h1>
+              <h1>the unproductivity tool</h1>
             </div>
           </Link>
         </div>
@@ -445,9 +459,10 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
                       }
 
                       if (subItem.isWidget) {
-                        const handleClick = subItem.label === 'Doordash Order'
-                          ? handleDoorDashClick
-                          : handleFbMarketplaceClick;
+                        const handleClick =
+                          subItem.label === 'Doordash Order'
+                            ? handleDoorDashClick
+                            : handleFbMarketplaceClick;
 
                         return (
                           <button
@@ -457,7 +472,9 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
                             onClick={handleClick}
                             role="menuitem"
                             tabIndex={isKeyboardMode ? 0 : -1}
-                            disabled={subItem.label === 'Doordash Order' && isOrdering}
+                            disabled={
+                              subItem.label === 'Doordash Order' && isOrdering
+                            }
                           >
                             <div className="card-icon lucide-icon">
                               {subItem.icon}
@@ -465,11 +482,18 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
                             <div className="card-content">
                               <div className="card-title">
                                 {subItem.label}
-                                {subItem.label === 'Doordash Order' && isOrdering && (
-                                  <span style={{ marginLeft: '8px', fontSize: '12px', color: '#10b981' }}>
-                                    Placing order...
-                                  </span>
-                                )}
+                                {subItem.label === 'Doordash Order' &&
+                                  isOrdering && (
+                                    <span
+                                      style={{
+                                        marginLeft: '8px',
+                                        fontSize: '12px',
+                                        color: '#10b981',
+                                      }}
+                                    >
+                                      Placing order...
+                                    </span>
+                                  )}
                               </div>
                               <div className="card-description">
                                 {subItem.description}
@@ -512,7 +536,9 @@ function GlassyNavbar({ onShowFbLowballWidget }: GlassyNavbarProps) {
           <div className="navbar-notification">
             <div
               style={{
-                backgroundColor: orderNotification.includes('🎉') ? '#10b981' : '#ef4444',
+                backgroundColor: orderNotification.includes('🎉')
+                  ? '#10b981'
+                  : '#ef4444',
                 color: 'white',
                 padding: '8px 16px',
                 borderRadius: '20px',
