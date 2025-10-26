@@ -232,6 +232,19 @@
     font-size: 16px;
   }
 
+  #logo {
+    height: 28px;
+    width: 28px;
+  }
+
+  .logoFlex {
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 16px;
+  }
+
   .navbar-nav {
     gap: 4px;
     max-width: 300px;
@@ -274,6 +287,19 @@
 
 @media (max-width: 480px) {
   .navbar-brand {
+    font-size: 14px;
+  }
+
+  #logo {
+    height: 24px;
+    width: 24px;
+  }
+
+  .logoFlex {
+    gap: 8px;
+  }
+
+  h1 {
     font-size: 14px;
   }
 
@@ -330,4 +356,42 @@
 
 .nav-item[data-section="automation"] .mega-menu-panel {
   width: clamp(400px, 50vw, 560px);
+}
+
+#logo {
+  height: 32px;
+  width: 32px;
+  border-radius: 8px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.logoFlex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover .logoFlex {
+  transform: translateY(-1px);
+}
+
+.navbar-brand:hover #logo {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+h1 {
+  font-weight: 500;
+  margin: 0;
+  font-size: 18px;
+  background: linear-gradient(135deg, #1a1a1a, #4a4a4a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-brand:hover h1 {
+  opacity: 0.8;
 }

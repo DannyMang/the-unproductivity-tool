@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Bird, Club, Keyboard, Worm, ShoppingCart, Store } from 'lucide-react';
 import './GlassyNavbar.css';
+import Logo from "../../../assets/images/theunproductivitytoollogo.png";
 
 interface NavItem {
   title: string;
@@ -142,7 +143,12 @@ const GlassyNavbar: React.FC = () => {
     <nav className="navbar-container" onMouseLeave={handleMouseLeave}>
       <div className="navbar-content">
         <div className="navbar-brand">
-          <Link to="/">The Unproductivity Tool</Link>
+          <Link to="/">
+          <div className="logoFlex">
+          <img id="logo" src={Logo}></img>
+          <h1>The Unproductivity Tool</h1>
+          </div>
+          </Link>
         </div>
 
         <div className="navbar-nav">
