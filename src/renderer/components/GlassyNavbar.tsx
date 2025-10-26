@@ -6,9 +6,9 @@ import './GlassyNavbar.css';
 // Game URLs for iframe embedding
 const gameUrls: { [key: string]: string } = {
   'Flappy Bird': 'https://flappybird.io/',
-  'Blackjack': 'https://www.247blackjack.com/',
-  'Monkeytype': 'https://monkeytype.com/',
-  'Snake Game': 'https://www.snakegame.net/'
+  'Blackjack': 'https://playpager.com/blackjack-game/',
+  'Typing Test': 'https://www.keybr.com/',
+  'Snake Game': 'https://googlesnakemods.com/v/current/'
 };
 
 // Function to create a specific game widget
@@ -40,7 +40,7 @@ const createGameWidget = (gameName: string, emoji: string) => {
 
   // Position widget randomly on screen
   const maxX = window.innerWidth - 850; // 800px width + 50px margin
-  const maxY = window.innerHeight - 650; // 600px height + 50px margin
+  const maxY = window.innerHeight - 750; // 700px height + 50px margin
 
   widget.style.left = `${Math.max(50, Math.random() * maxX)}px`;
   widget.style.top = `${Math.max(50, Math.random() * maxY)}px`;
@@ -86,7 +86,7 @@ const createGameWidget = (gameName: string, emoji: string) => {
 
       // Keep widget within screen bounds
       const newX = Math.max(0, Math.min(window.innerWidth - 850, currentX));
-      const newY = Math.max(0, Math.min(window.innerHeight - 650, currentY));
+      const newY = Math.max(0, Math.min(window.innerHeight - 750, currentY));
 
       widget.style.transform = `translate(${newX}px, ${newY}px)`;
     }
@@ -151,12 +151,12 @@ const GlassyNavbar = () => {
           gameEmoji: '♠️',
         },
         {
-          label: 'Monkeytype',
-          path: '/games/monkeytype',
-          description: 'Typing practice with stats.',
+          label: 'Typing Test',
+          path: '/games/typing-test',
+          description: 'Keyboard practice with stats.',
           icon: <Keyboard size={20} />,
           isGame: true,
-          gameName: 'Monkeytype',
+          gameName: 'Typing Test',
           gameEmoji: '🐒',
         },
         {
