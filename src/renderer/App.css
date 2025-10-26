@@ -222,3 +222,112 @@ body {
     opacity: 1;
   }
 }
+
+/* Game Widget Distraction Styles */
+.game-widget-distraction {
+  position: absolute;
+  width: 600px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  pointer-events: auto;
+  z-index: 1000001;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: widgetAppear 0.3s ease-out;
+  cursor: move;
+}
+
+@keyframes widgetAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.game-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: move;
+}
+
+.game-widget-title {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: 'Neue Montreal', sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-widget-close {
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 0, 0, 0.3);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  font-family: 'Neue Montreal', sans-serif;
+}
+
+.game-widget-close:hover {
+  background: rgba(255, 0, 0, 0.5);
+  transform: scale(1.1);
+}
+
+.game-widget-content {
+  padding: 20px;
+  height: calc(100% - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-widget-preview {
+  text-align: center;
+  color: white;
+  font-family: 'Neue Montreal', sans-serif;
+}
+
+.game-widget-preview h3 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-widget-preview p {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.game-widget-placeholder {
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.game-widget-emoji {
+  font-size: 48px;
+  opacity: 0.7;
+}
