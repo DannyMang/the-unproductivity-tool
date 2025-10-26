@@ -416,30 +416,7 @@ function GlassyNavbar() {
           ))}
         </div>
 
-        {/* Cooldown Status Display */}
-        <div className="navbar-cooldown">
-          <div
-            style={{
-              backgroundColor: canTest ? '#10b981' : '#6b7280',
-              color: 'white',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              fontSize: '14px',
-              fontWeight: '500',
-              opacity: 0.9,
-              transition: 'all 0.3s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              minWidth: '160px',
-              justifyContent: 'center',
-            }}
-          >
-            <Zap size={14} />
-            {canTest ? 'Ready' : `Cooldown: ${remainingCooldown}s`}
-          </div>
-        </div>
-      </div>
+       </div>
     </nav>
   );
 }
