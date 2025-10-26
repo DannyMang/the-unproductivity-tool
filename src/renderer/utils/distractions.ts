@@ -223,10 +223,7 @@ const triggerRandomDistraction = (distractionContainerRef) => {
     return false;
   }
 
-  // Focus the app first so user sees the distraction
-  focusApp();
-
-  const distractionType = Math.floor(Math.random() * 2); // Reduced to 3 distraction types
+  const distractionType = Math.floor(Math.random() * 2); // Reduced to 2 distraction types
   console.log('Selected distraction type:', distractionType);
 
   switch (distractionType) {
