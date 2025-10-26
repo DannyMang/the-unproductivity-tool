@@ -1,13 +1,10 @@
 const DISTRACTION_URLS = [
-  'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+  'https://www.youtube.com/watch?v=rCrwxcZUork',
   'https://www.reddit.com/r/amitheasshole',
   'https://www.tiktok.com',
   'https://twitter.com/explore',
   'https://www.instagram.com/explore',
-  'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-  'https://www.netflix.com',
 ];
-
 
 const focusApp = () => {
   window.electronAPI?.focusWindow();
@@ -18,8 +15,6 @@ const openDistractionWebsite = () => {
     DISTRACTION_URLS[Math.floor(Math.random() * DISTRACTION_URLS.length)];
   window.electronAPI?.openExternal(url);
 };
-
-
 
 const flashScreen = (distractionContainerRef) => {
   const flash = document.createElement('div');
@@ -45,7 +40,7 @@ const createGameWidgetDistraction = (distractionContainerRef) => {
     { name: 'Blackjack', emoji: '♠️' },
     { name: 'Flappy Bird', emoji: '🐦' },
     { name: 'Monkeytype', emoji: '🐒' },
-    { name: 'Snake Game', emoji: '🐍' }
+    { name: 'Snake Game', emoji: '🐍' },
   ];
 
   const selectedGame = games[Math.floor(Math.random() * games.length)];
@@ -154,9 +149,14 @@ const triggerRandomDistraction = (distractionContainerRef) => {
   );
 
   // Check if distraction is allowed (additional safety check)
-  if (window.distractionTimeout && !window.distractionTimeout.canTriggerDistraction()) {
+  if (
+    window.distractionTimeout &&
+    !window.distractionTimeout.canTriggerDistraction()
+  ) {
     const remainingTime = window.distractionTimeout.getRemainingCooldownTime();
-    console.log(`Distraction blocked by timeout system: ${remainingTime}s remaining`);
+    console.log(
+      `Distraction blocked by timeout system: ${remainingTime}s remaining`,
+    );
     return false;
   }
 
