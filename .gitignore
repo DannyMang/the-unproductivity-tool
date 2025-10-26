@@ -31,3 +31,9 @@ npm-debug.log.*
 .github/
 .editorconfig
 .vscode/
+
+# Backend environment variables
+backend/.env
+
+# Puppeteer browser session data
+backend/puppeteer-data
