@@ -3,6 +3,7 @@ import icon from '../../assets/icon.svg';
 import './App.css';
 
 import FbWidget from './components/FbWidget';
+import DoordashWidget from './components/doordash/DoordashWidget';
 
 function Hello() {
   return (
@@ -38,6 +39,7 @@ function Hello() {
         </a>
       </div>
       <FbWidget></FbWidget>
+      <DoordashWidget></DoordashWidget>
     </div>
   );
 }

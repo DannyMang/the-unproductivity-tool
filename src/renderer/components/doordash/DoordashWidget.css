@@ -1,0 +1,48 @@
+#doordashlogo {
+    border-radius: 8px;
+    height: 3vw;
+    margin-bottom: 10px;
+}
+
+.widgetContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 20px;
+    width: 700px;
+    min-width: 700px;
+    max-width: 700px;
+    margin: 10px;
+}
+
+.columnFlex {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.columnSpaced {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2vw;
+}
+
+.productImage {
+    border-radius: 8px;
+    height: 10vw;
+    width: 15vw;
+    object-fit: cover;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: rgb(255, 255, 255, 0.5);
+}
