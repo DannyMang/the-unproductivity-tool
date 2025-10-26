@@ -1,8 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bird, Club, Keyboard, Worm, ShoppingCart, Store } from 'lucide-react';
+import { Bird, Club, Keyboard, Worm, ShoppingCart, Store, Zap } from 'lucide-react';
 import './GlassyNavbar.css';
 import Logo from '../../../assets/images/theunproductivitytoollogo.png';
+
+// Timeout management constants (matching App.tsx)
+const COOLDOWN_PERIOD = 60 * 1000; // 1 minute in milliseconds
+
+// Global timeout state access (matching App.tsx)
+const getRemainingCooldownTime = (): number => {
+  if (typeof window !== 'undefined' && window.distractionTimeout) {
+    return window.distractionTimeout.getRemainingCooldownTime();
+  }
+  return 0;
+};
+
+const canTriggerDistraction = (): boolean => {
+  if (typeof window !== 'undefined' && window.distractionTimeout) {
+    return window.distractionTimeout.canTriggerDistraction();
+  }
+  return true;
+};
 
 // Game URLs for iframe embedding
 const gameUrls: { [key: string]: string } = {
@@ -126,8 +144,24 @@ interface NavItem {
 function GlassyNavbar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
+  const [remainingCooldown, setRemainingCooldown] = useState(0);
+  const [canTest, setCanTest] = useState(true);
   const timeoutRef = useRef<number | null>(null);
   const location = useLocation();
+
+  // Update cooldown status every second (matching Home component logic)
+  useEffect(() => {
+    const updateCooldown = () => {
+      const remaining = getRemainingCooldownTime();
+      setRemainingCooldown(remaining);
+      setCanTest(canTriggerDistraction());
+    };
+
+    updateCooldown();
+    const interval = setInterval(updateCooldown, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const navItems: NavItem[] = [
     {
@@ -380,6 +414,30 @@ function GlassyNavbar() {
               )}
             </div>
           ))}
+        </div>
+
+        {/* Cooldown Status Display */}
+        <div className="navbar-cooldown">
+          <div
+            style={{
+              backgroundColor: canTest ? '#10b981' : '#6b7280',
+              color: 'white',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              fontSize: '14px',
+              fontWeight: '500',
+              opacity: 0.9,
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              minWidth: '160px',
+              justifyContent: 'center',
+            }}
+          >
+            <Zap size={14} />
+            {canTest ? 'Ready' : `Cooldown: ${remainingCooldown}s`}
+          </div>
         </div>
       </div>
     </nav>

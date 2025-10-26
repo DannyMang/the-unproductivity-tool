@@ -118,7 +118,7 @@ function DistractionOverlay() {
       );
       return false;
     }
-  }, []);
+  }, [distractionContainerRef]);
 
   useEffect(() => {
     console.log('Distraction overlay initialized with timeout system');
@@ -199,46 +199,7 @@ function DistractionOverlay() {
 }
 
 function Home() {
-  const [remainingCooldown, setRemainingCooldown] = useState(0);
-  const [canTest, setCanTest] = useState(true);
-
-  // Update cooldown status every second
-  useEffect(() => {
-    const updateCooldown = () => {
-      const remaining = getRemainingCooldownTime();
-      setRemainingCooldown(remaining);
-      setCanTest(canTriggerDistraction());
-    };
-
-    updateCooldown();
-    const interval = setInterval(updateCooldown, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  
-  return (
-    <div>
-      <div className="Hello">
-        <div
-          style={{
-            backgroundColor: canTest ? '#10b981' : '#6b7280',
-            color: 'white',
-            padding: '10px 20px',
-            margin: '10px',
-            borderRadius: '5px',
-            fontSize: '16px',
-            opacity: 0.9,
-            transition: 'all 0.3s ease',
-            display: 'inline-block',
-          }}
-        >
-          <Zap size={16} style={{ marginRight: '8px' }} />
-          {canTest ? 'Distraction ready to fire' : `Cooldown: ${remainingCooldown}s`}
-        </div>
-      </div>
-    </div>
-  );
+  return <div />;
 }
 
 export default function App() {
