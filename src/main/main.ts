@@ -39,6 +39,12 @@ if (!gotTheLock) {
 
   let mainWindow: BrowserWindow | null = null;
 
+  // Simple per-app cooldown configuration
+  const COOLDOWN_PERIOD = 60 * 1000; // 1 minute in milliseconds
+
+  // Per-app cooldown tracking
+  let appCooldowns: { [appName: string]: number } = {};
+
   ipcMain.on('ipc-example', async (event, arg) => {
     const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
     console.log(msgTemplate(arg));
@@ -51,10 +57,30 @@ if (!gotTheLock) {
     startAppMonitoring(event);
   });
 
+  // Handle focus window requests from renderer
+  ipcMain.on('FOCUS_WINDOW', async () => {
+    if (mainWindow) {
+      console.log('FOCUS_WINDOW: Bringing window to front');
+      if (mainWindow.isMinimized()) mainWindow.restore();
+
+      // Ensure window is on top and focused
+      mainWindow.setAlwaysOnTop(true, 'screen-saver');
+      mainWindow.focus();
+      mainWindow.show();
+
+      // Reset always on top after a short delay
+      setTimeout(() => {
+        if (mainWindow) {
+          mainWindow.setAlwaysOnTop(false);
+        }
+      }, 1000);
+    }
+  });
+
   // Application detection system
   const TARGET_APPLICATIONS = [
-    'Code', // VS Code
-    'Terminal', // Terminal
+    // 'Code', // VS Code
+    // 'Terminal', // Terminal
     'iTerm', // iTerm2
     'Sublime Text', // Sublime Text
     'Atom', // Atom editor
@@ -79,6 +105,29 @@ if (!gotTheLock) {
     }
   }
 
+  // Helper function to check if app is on cooldown
+  function isAppOnCooldown(appName: string): boolean {
+    const now = Date.now();
+    const lastDistractionTime = appCooldowns[appName] || 0;
+    const timeSinceLastDistraction = now - lastDistractionTime;
+
+    if (timeSinceLastDistraction < COOLDOWN_PERIOD) {
+      const remainingTime = Math.ceil(
+        (COOLDOWN_PERIOD - timeSinceLastDistraction) / 1000,
+      );
+      console.log(`${appName} is on cooldown: ${remainingTime}s remaining`);
+      return true;
+    }
+
+    return false;
+  }
+
+  // Helper function to put app on cooldown
+  function putAppOnCooldown(appName: string) {
+    appCooldowns[appName] = Date.now();
+    console.log(`${appName} put on cooldown for 1 minute`);
+  }
+
   function startAppMonitoring(event: any) {
     const { exec } = require('child_process');
 
@@ -98,23 +147,30 @@ if (!gotTheLock) {
               )
             ) {
               console.log('DETECTED TARGET APPLICATION:', appName);
-              // Trigger distraction
-              console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
-              const distractionData = {
-                type: 'app_detected',
-                app: appName,
-                message: 'STOP WORKING! HAVE SOME FUN INSTEAD! 🎉',
-              };
-              console.log('Distraction data to send:', distractionData);
 
-              // Ensure we have a valid webContents before sending
-              if (event && event.sender) {
-                event.sender.send('TRIGGER_DISTRACTION', distractionData);
-                console.log('TRIGGER_DISTRACTION event sent successfully');
-              } else {
-                console.error(
-                  'Cannot send TRIGGER_DISTRACTION: event or event.sender is null',
-                );
+              // Check if app is on cooldown
+              if (!isAppOnCooldown(appName)) {
+                // Trigger distraction
+                console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
+                const distractionData = {
+                  type: 'app_detected',
+                  app: appName,
+                  message: 'STOP WORKING! HAVE SOME FUN INSTEAD! 🎉',
+                };
+                console.log('Distraction data to send:', distractionData);
+
+                // Put app on cooldown
+                putAppOnCooldown(appName);
+
+                // Ensure we have a valid webContents before sending
+                if (event && event.sender) {
+                  event.sender.send('TRIGGER_DISTRACTION', distractionData);
+                  console.log('TRIGGER_DISTRACTION event sent successfully');
+                } else {
+                  console.error(
+                    'Cannot send TRIGGER_DISTRACTION: event or event.sender is null',
+                  );
+                }
               }
             }
           },
@@ -133,15 +189,24 @@ if (!gotTheLock) {
               )
             ) {
               console.log('DETECTED TARGET APPLICATION:', output);
-              console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
-              const distractionData = {
-                type: 'app_detected',
-                app: output,
-                message: 'TIME FOR A BREAK! 🎮',
-              };
-              console.log('Distraction data to send:', distractionData);
-              event.sender.send('TRIGGER_DISTRACTION', distractionData);
-              console.log('TRIGGER_DISTRACTION event sent successfully');
+
+              // Check if app is on cooldown
+              if (!isAppOnCooldown(output)) {
+                // Trigger distraction
+                console.log('SENDING TRIGGER_DISTRACTION event to renderer...');
+                const distractionData = {
+                  type: 'app_detected',
+                  app: output,
+                  message: 'TIME FOR A BREAK! 🎮',
+                };
+                console.log('Distraction data to send:', distractionData);
+
+                // Put app on cooldown
+                putAppOnCooldown(output);
+
+                event.sender.send('TRIGGER_DISTRACTION', distractionData);
+                console.log('TRIGGER_DISTRACTION event sent successfully');
+              }
             }
           },
         );

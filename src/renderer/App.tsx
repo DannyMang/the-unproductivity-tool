@@ -1,9 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Zap } from 'lucide-react';
 import './App.css';
 import triggerRandomDistraction from './utils/distractions';
 import icon from '../../assets/icon.png';
 
+import FbWidget from './components/FbWidget';
+import DoordashWidget from './components/doordash/DoordashWidget';
 // Components
 import GlassyNavbar from './components/GlassyNavbar';
 
@@ -20,6 +23,55 @@ import FacebookMarketplace from './components/Automation/FacebookMarketplace';
 // Test that the import worked
 console.log('Distractions module imported:', typeof triggerRandomDistraction);
 
+// Timeout management constants
+const COOLDOWN_PERIOD = 60 * 1000; // 1 minute in milliseconds
+
+// Global timeout state management
+let isOnCooldown = false;
+let cooldownTimeoutId: NodeJS.Timeout | null = null;
+let lastDistractionTime = 0;
+
+// Helper functions for timeout management
+const canTriggerDistraction = (): boolean => {
+  const now = Date.now();
+  return !isOnCooldown && now - lastDistractionTime >= COOLDOWN_PERIOD;
+};
+
+const startCooldown = () => {
+  isOnCooldown = true;
+  lastDistractionTime = Date.now();
+
+  // Clear any existing timeout
+  if (cooldownTimeoutId) {
+    clearTimeout(cooldownTimeoutId);
+  }
+
+  // Set new timeout to end cooldown
+  cooldownTimeoutId = setTimeout(() => {
+    isOnCooldown = false;
+    cooldownTimeoutId = null;
+    console.log('Cooldown ended - distractions can now be triggered');
+  }, COOLDOWN_PERIOD);
+
+  console.log('Cooldown started - no distractions for 1 minute');
+};
+
+const getRemainingCooldownTime = (): number => {
+  if (!isOnCooldown) return 0;
+  const elapsed = Date.now() - lastDistractionTime;
+  const remaining = Math.max(0, COOLDOWN_PERIOD - elapsed);
+  return Math.ceil(remaining / 1000); // Return seconds
+};
+
+// Expose timeout functions globally for other modules to use
+if (typeof window !== 'undefined') {
+  window.distractionTimeout = {
+    canTriggerDistraction,
+    startCooldown,
+    getRemainingCooldownTime,
+  };
+}
+
 // Add electron API types for contextBridge
 declare global {
   interface Window {
@@ -31,6 +83,11 @@ declare global {
       ) => (() => void) | undefined;
       openExternal: (url: string) => void;
     };
+    distractionTimeout?: {
+      canTriggerDistraction: () => boolean;
+      startCooldown: () => void;
+      getRemainingCooldownTime: () => number;
+    };
   }
 }
 
@@ -38,8 +95,33 @@ declare global {
 function DistractionOverlay() {
   const distractionContainerRef = useRef<HTMLDivElement>(null);
 
+  // Safe distraction trigger that respects cooldown
+  const safeTriggerDistraction = useCallback((source: string) => {
+    if (!canTriggerDistraction()) {
+      const remainingTime = getRemainingCooldownTime();
+      console.log(
+        `Distraction blocked from ${source}: ${remainingTime}s remaining on cooldown`,
+      );
+      return false;
+    }
+
+    try {
+      console.log(`Triggering distraction from ${source}...`);
+      triggerRandomDistraction(distractionContainerRef);
+      startCooldown();
+      console.log(`Distraction triggered successfully from ${source}`);
+      return true;
+    } catch (error) {
+      console.error(
+        `Error calling triggerRandomDistraction from ${source}:`,
+        error,
+      );
+      return false;
+    }
+  }, [distractionContainerRef]);
+
   useEffect(() => {
-    console.log('Distraction overlay initialized');
+    console.log('Distraction overlay initialized with timeout system');
 
     // Start monitoring for target applications
     const startMonitoring = () => {
@@ -65,13 +147,8 @@ function DistractionOverlay() {
 
       console.log('DISTRACTION TRIGGERED:', { type, app, message });
 
-      try {
-        console.log('About to call triggerRandomDistraction...');
-        triggerRandomDistraction(distractionContainerRef);
-        console.log('triggerRandomDistraction called successfully');
-      } catch (error) {
-        console.error('Error calling triggerRandomDistraction:', error);
-      }
+      // Use safe trigger that respects cooldown
+      safeTriggerDistraction(`main process (${app})`);
     };
 
     // Set up IPC listener for distractions
@@ -82,21 +159,12 @@ function DistractionOverlay() {
     );
     console.log('IPC listener set up:', unsubscribe ? 'success' : 'failed');
 
-    // Add Electron API mock for development
+    // Add Electron API mock for development (without automatic distractions)
     if (!window.electronAPI) {
       window.electronAPI = {
         send: (channel: string, data?: any) => {
           console.log('Mock IPC send:', channel, data);
-          // Simulate a distraction trigger every 10 seconds for testing
-          if (channel === 'START_MONITORING') {
-            setInterval(() => {
-              handleDistraction(null as any, {
-                type: 'test',
-                app: 'Test App',
-                message: 'Test!',
-              });
-            }, 10000);
-          }
+          // No automatic test distractions - only send when explicitly called
         },
         on: (channel: string, func: (...args: any[]) => void) => {
           console.log('Mock IPC listener setup for:', channel);
@@ -113,18 +181,6 @@ function DistractionOverlay() {
 
     startMonitoring();
 
-    // Test distractions directly every 5 seconds (for debugging)
-    console.log('Setting up direct distraction test (every 5 seconds)...');
-    const testDistractionInterval = setInterval(() => {
-      console.log('DIRECT TEST: Triggering distraction...');
-      if (distractionContainerRef.current) {
-        console.log('Container ref exists, calling distraction function');
-        triggerRandomDistraction(distractionContainerRef);
-      } else {
-        console.log('Container ref is null');
-      }
-    }, 5000);
-
     return () => {
       // Clean up IPC listeners
       const unsubscribe = window.electronAPI?.on(
@@ -132,11 +188,8 @@ function DistractionOverlay() {
         () => {},
       );
       unsubscribe?.();
-
-      // Clean up test interval
-      clearInterval(testDistractionInterval);
     };
-  }, []);
+  }, [safeTriggerDistraction]);
 
   return (
     <div className="invisible-overlay">
@@ -146,83 +199,38 @@ function DistractionOverlay() {
 }
 
 function Home() {
-  return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>The Unproductivity Tool</h1>
-      <p
-        style={{
-          maxWidth: '600px',
-          margin: '0 auto',
-          textAlign: 'center',
-          lineHeight: '1.6',
-        }}
-      >
-        A collection of fun games and automation tools to help you be more
-        productive... or not!
-      </p>
-      <div className="Hello">
-        <button
-          type="button"
-          onClick={() => {
-            console.log('TEST: Manual distraction triggered');
-            const container = document.getElementById('distraction-container');
-            if (container) {
-              triggerRandomDistraction({ current: container });
-            } else {
-              console.error('Distraction container not found');
-            }
-          }}
-          style={{
-            backgroundColor: '#ff6b6b',
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            margin: '10px',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontSize: '16px',
-          }}
-        >
-          🎉 Test Distraction
-        </button>
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
-  );
+  return <div />;
 }
 
 export default function App() {
+  const [isFbWidgetMinimized, setIsFbWidgetMinimized] = useState(false);
+  const [isDoordashWidgetMinimized, setIsDoordashWidgetMinimized] =
+    useState(false);
+
+  const toggleFbWidget = () => {
+    setIsFbWidgetMinimized(!isFbWidgetMinimized);
+  };
+
+  const toggleDoordashWidget = () => {
+    setIsDoordashWidgetMinimized(!isDoordashWidgetMinimized);
+  };
+
   return (
     <>
       <DistractionOverlay />
       <Router>
         <GlassyNavbar />
+        {/* Fixed positioned widgets container */}
+        <div className="widgets-container">
+          <FbWidget
+            isMinimized={isFbWidgetMinimized}
+            onMinimizeToggle={toggleFbWidget}
+          />
+          <DoordashWidget
+            isMinimized={isDoordashWidgetMinimized}
+            onMinimizeToggle={toggleDoordashWidget}
+          />
+        </div>
         <Routes>
           <Route path="/" element={<Home />} />
 
