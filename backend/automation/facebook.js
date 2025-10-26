@@ -23,7 +23,10 @@ async function debugPageHTML(page, orderId, context = '') {
         url: window.location.href,
       };
     });
-    console.log(`[${orderId}] 🔍 DEBUG ${context}:`, JSON.stringify(html, null, 2));
+    console.log(
+      `[${orderId}] 🔍 DEBUG ${context}:`,
+      JSON.stringify(html, null, 2),
+    );
   } catch (error) {
     console.log(`[${orderId}] Could not debug HTML: ${error.message}`);
   }
@@ -39,10 +42,14 @@ async function debugDOM(page, sessionId, context = '') {
       const textareas = Array.from(document.querySelectorAll('textarea'));
 
       // Get all contenteditable elements
-      const contentEditables = Array.from(document.querySelectorAll('[contenteditable="true"]'));
+      const contentEditables = Array.from(
+        document.querySelectorAll('[contenteditable="true"]'),
+      );
 
       // Get all inputs
-      const inputs = Array.from(document.querySelectorAll('input[type="text"]'));
+      const inputs = Array.from(
+        document.querySelectorAll('input[type="text"]'),
+      );
 
       return {
         textareas: textareas.map((el, i) => ({
@@ -71,7 +78,10 @@ async function debugDOM(page, sessionId, context = '') {
       };
     });
 
-    console.log(`[${sessionId}] 🔍 DOM ${context}:`, JSON.stringify(domInfo, null, 2));
+    console.log(
+      `[${sessionId}] 🔍 DOM ${context}:`,
+      JSON.stringify(domInfo, null, 2),
+    );
   } catch (error) {
     console.log(`[${sessionId}] Could not debug DOM: ${error.message}`);
   }
@@ -82,14 +92,10 @@ async function debugDOM(page, sessionId, context = '') {
  * @param {Object} options - Automation options
  * @param {string} options.sessionId - Unique session identifier
  * @param {string} options.searchItem - Item to search for on Marketplace
- * @param {number} options.numPeople - Number of people to lowball (default: 30, max: 100)
+ * @param {number} options.numPeople - Number of people to lowball (default: 3, max: 10)
  * @returns {Promise<Object>} Session object
  */
-async function lowballMarketplace({
-  sessionId,
-  searchItem,
-  numPeople = 30,
-}) {
+async function lowballMarketplace({ sessionId, searchItem, numPeople = 3 }) {
   // Enforce limits
   const peopleToLowball = Math.min(Math.max(1, numPeople), 100);
 
@@ -194,7 +200,9 @@ async function lowballMarketplace({
     console.log(`[${sessionId}] Found ${listings.length} listings`);
 
     if (listings.length === 0) {
-      throw new Error('No listings found for this search. Try a different search term.');
+      throw new Error(
+        'No listings found for this search. Try a different search term.',
+      );
     }
 
     // Lowball sellers
@@ -206,14 +214,13 @@ async function lowballMarketplace({
     session.status = 'completed';
 
     // Keep browser open for review
-    console.log(`[${sessionId}] Keeping browser open for 30 seconds for review...`);
+    console.log(
+      `[${sessionId}] Keeping browser open for 30 seconds for review...`,
+    );
     await wait(30000);
     await browser.close();
   } catch (error) {
-    console.error(
-      `[${sessionId}] Error during automation:`,
-      error.message,
-    );
+    console.error(`[${sessionId}] Error during automation:`, error.message);
     session.status = 'failed';
     await browser.close();
     throw error;
@@ -372,7 +379,9 @@ async function getListings(page, sessionId) {
       const results = [];
 
       // Strategy 1: Find all marketplace item links
-      const allLinks = Array.from(document.querySelectorAll('a[href*="/marketplace/item/"]'));
+      const allLinks = Array.from(
+        document.querySelectorAll('a[href*="/marketplace/item/"]'),
+      );
 
       for (const link of allLinks) {
         const href = link.href;
@@ -399,7 +408,10 @@ async function getListings(page, sessionId) {
         let isUnread = false;
         for (let i = 0; i < 5; i++) {
           if (!element) break;
-          if (element.textContent?.includes('Unread') || element.getAttribute('aria-label')?.includes('Unread')) {
+          if (
+            element.textContent?.includes('Unread') ||
+            element.getAttribute('aria-label')?.includes('Unread')
+          ) {
             isUnread = true;
             break;
           }
@@ -414,19 +426,32 @@ async function getListings(page, sessionId) {
 
         // Method 1: Check image alt text
         const img = link.querySelector('img');
-        if (img && img.alt && img.alt !== 'Image may contain: ' && img.alt.length > 2) {
+        if (
+          img &&
+          img.alt &&
+          img.alt !== 'Image may contain: ' &&
+          img.alt.length > 2
+        ) {
           title = img.alt;
         }
 
         // Method 2: Look for span with actual text near the link
         if (title === 'Unknown') {
-          const parent = link.closest('div[role="group"], div[class*="item"], div[class*="card"]');
+          const parent = link.closest(
+            'div[role="group"], div[class*="item"], div[class*="card"]',
+          );
           if (parent) {
             const spans = parent.querySelectorAll('span');
             for (const span of spans) {
               const text = span.textContent?.trim();
               // Look for text that's not a price and has reasonable length
-              if (text && text.length > 3 && text.length < 100 && !text.startsWith('$') && !text.includes('·')) {
+              if (
+                text &&
+                text.length > 3 &&
+                text.length < 100 &&
+                !text.startsWith('$') &&
+                !text.includes('·')
+              ) {
                 title = text;
                 break;
               }
@@ -506,7 +531,9 @@ async function lowballSellers(page, session, listings) {
       });
 
       if (alreadyMessaged) {
-        console.log(`[${sessionId}] ⏭️  Already messaged this seller, skipping to next listing...`);
+        console.log(
+          `[${sessionId}] ⏭️  Already messaged this seller, skipping to next listing...`,
+        );
         listingIndex++;
         continue;
       }
@@ -551,7 +578,9 @@ async function lowballSellers(page, session, listings) {
           }
 
           // Find and focus the visible one
-          const visibleTextarea = textareas.find((el) => el.offsetParent !== null);
+          const visibleTextarea = textareas.find(
+            (el) => el.offsetParent !== null,
+          );
           if (visibleTextarea) {
             visibleTextarea.focus();
             visibleTextarea.click();
@@ -562,14 +591,18 @@ async function lowballSellers(page, session, listings) {
         });
 
         if (foundTextarea.found) {
-          console.log(`[${sessionId}] ✓ Found ${foundTextarea.count} textareas, focused visible one`);
+          console.log(
+            `[${sessionId}] ✓ Found ${foundTextarea.count} textareas, focused visible one`,
+          );
 
           // Wait for focus
           await wait(300);
 
           // CRITICAL: Must type character-by-character to trigger React's onChange handlers
           // React controlled inputs don't respond to direct DOM manipulation
-          console.log(`[${sessionId}] Selecting all text with keyboard shortcut...`);
+          console.log(
+            `[${sessionId}] Selecting all text with keyboard shortcut...`,
+          );
 
           // Use keyboard shortcut to select all (Cmd+A on Mac, Ctrl+A on Windows)
           const isMac = process.platform === 'darwin';
@@ -581,7 +614,9 @@ async function lowballSellers(page, session, listings) {
 
           // Type the custom message character-by-character
           // This triggers React's onChange handler for each keystroke, updating React state
-          console.log(`[${sessionId}] Typing custom message character-by-character...`);
+          console.log(
+            `[${sessionId}] Typing custom message character-by-character...`,
+          );
           await page.keyboard.type(message, { delay: 20 }); // 20ms per character = ~50 chars/sec
 
           await wait(500);
@@ -591,11 +626,13 @@ async function lowballSellers(page, session, listings) {
             const textareas = Array.from(document.querySelectorAll('textarea'));
 
             // Check if ALL textareas have the custom message
-            const allMatch = textareas.every((textarea) =>
-              textarea.value === expectedMsg
+            const allMatch = textareas.every(
+              (textarea) => textarea.value === expectedMsg,
             );
 
-            const visibleTextarea = textareas.find((el) => el.offsetParent !== null);
+            const visibleTextarea = textareas.find(
+              (el) => el.offsetParent !== null,
+            );
 
             if (visibleTextarea && visibleTextarea.value) {
               return {
@@ -612,19 +649,31 @@ async function lowballSellers(page, session, listings) {
           }, message);
 
           if (messageInInput.found && messageInInput.matches) {
-            console.log(`[${sessionId}] ✓ Custom message verified in input (${messageInInput.length} chars)`);
-            console.log(`[${sessionId}]   Preview: "${messageInInput.preview}..."`);
+            console.log(
+              `[${sessionId}] ✓ Custom message verified in input (${messageInInput.length} chars)`,
+            );
+            console.log(
+              `[${sessionId}]   Preview: "${messageInInput.preview}..."`,
+            );
             if (messageInInput.allTextareasMatch) {
-              console.log(`[${sessionId}] ✓ ALL ${messageInInput.textareaCount} textareas updated successfully`);
+              console.log(
+                `[${sessionId}] ✓ ALL ${messageInInput.textareaCount} textareas updated successfully`,
+              );
             } else {
-              console.log(`[${sessionId}] ⚠️  WARNING: Not all textareas match! This may cause issues.`);
+              console.log(
+                `[${sessionId}] ⚠️  WARNING: Not all textareas match! This may cause issues.`,
+              );
             }
             messageTyped = { success: true };
           } else if (messageInInput.found) {
-            console.log(`[${sessionId}] ⚠️  Message in input but doesn't match: "${messageInInput.preview}"`);
+            console.log(
+              `[${sessionId}] ⚠️  Message in input but doesn't match: "${messageInInput.preview}"`,
+            );
             messageTyped = { success: false };
           } else {
-            console.log(`[${sessionId}] ⚠️  No message found in input after typing!`);
+            console.log(
+              `[${sessionId}] ⚠️  No message found in input after typing!`,
+            );
             messageTyped = { success: false };
           }
         } else {
@@ -637,13 +686,14 @@ async function lowballSellers(page, session, listings) {
       }
 
       if (messageTyped.success) {
-
         // Instead of clicking Send automatically, wait for USER to send
         console.log(`[${sessionId}] ✅ Message ready to send!`);
         console.log(`[${sessionId}] 👆 PLEASE CLICK THE SEND BUTTON NOW...`);
 
         // Wait for user to click Send (textarea will be cleared when sent)
-        console.log(`[${sessionId}] ⏳ Waiting up to 30 seconds for you to send the message...`);
+        console.log(
+          `[${sessionId}] ⏳ Waiting up to 30 seconds for you to send the message...`,
+        );
 
         let messageSent = false;
         let attempts = 0;
@@ -654,7 +704,9 @@ async function lowballSellers(page, session, listings) {
 
           const checkSent = await page.evaluate(() => {
             const textareas = Array.from(document.querySelectorAll('textarea'));
-            const visibleTextarea = textareas.find((el) => el.offsetParent !== null);
+            const visibleTextarea = textareas.find(
+              (el) => el.offsetParent !== null,
+            );
 
             // Message is sent when textarea is cleared
             if (visibleTextarea && visibleTextarea.value === '') {
@@ -675,7 +727,9 @@ async function lowballSellers(page, session, listings) {
           // Progress indicator every 5 seconds
           if (attempts % 10 === 0) {
             const elapsed = attempts * 0.5;
-            console.log(`[${sessionId}] ⏳ Still waiting... (${elapsed}s elapsed)`);
+            console.log(
+              `[${sessionId}] ⏳ Still waiting... (${elapsed}s elapsed)`,
+            );
           }
         }
 
