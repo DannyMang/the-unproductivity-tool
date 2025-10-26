@@ -106,7 +106,14 @@ const flashScreen = (distractionContainerRef) => {
     }, i * 300);
   }
 };
+const focusApp = () => {
+  window.electronAPI?.focusWindow();
+};
+
 const triggerRandomDistraction = (distractionContainerRef) => {
+  // Focus the app first so user sees the distraction
+  focusApp();
+
   const distractionType = Math.floor(Math.random() * 5);
   switch (distractionType) {
     case 0:

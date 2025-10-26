@@ -1,16 +1,3 @@
-const DISTRACTION_MESSAGES = [
-  'STOP WORKING! 🎉',
-  'TIME FOR A BREAK! 🎮',
-  'YOU SHOULD BE HAVING FUN! 🎪',
-  'WORK IS BORING! 🚀',
-  'GO WATCH SOME CATS! 🐱',
-  'MEMES ARE WAITING! 😂',
-  'PRODUCTIVITY IS OVERRATED! 🌟',
-  'TAKE A NAP INSTEAD! 😴',
-  'SOCIAL MEDIA CALLS! 📱',
-  'DISTRACT YOURSELF! 🎭',
-];
-
 const DISTRACTION_URLS = [
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   'https://www.reddit.com/r/amitheasshole',
@@ -21,53 +8,9 @@ const DISTRACTION_URLS = [
   'https://www.netflix.com',
 ];
 
-const createDistractionPopup = (distractionContainerRef) => {
-  console.log('createDistractionPopup called');
 
-  const popup = document.createElement('div');
-  popup.className = 'distraction-popup';
-  popup.textContent =
-    DISTRACTION_MESSAGES[
-      Math.floor(Math.random() * DISTRACTION_MESSAGES.length)
-    ];
-
-  console.log('Popup message:', popup.textContent);
-  console.log('Window dimensions:', window.innerWidth, window.innerHeight);
-
-  popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
-  popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
-
-  console.log('Popup position:', popup.style.left, popup.style.top);
-
-  popup.onclick = (e) => {
-    console.log('Popup clicked!');
-    // Check if clicked on the X button (right side)
-    if (e.offsetX > popup.offsetWidth - 30) {
-      console.log('Popup closed via X button');
-      popup.remove();
-    } else {
-      console.log('Popup moved to new position');
-      // Move the popup when clicked on the main area
-      popup.style.left = `${Math.random() * (window.innerWidth - 300)}px`;
-      popup.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
-    }
-  };
-
-  console.log(
-    'About to append popup to container:',
-    distractionContainerRef.current,
-  );
-  distractionContainerRef.current?.appendChild(popup);
-  console.log('Popup appended to DOM');
-
-  // Auto-remove after 8 seconds
-  setTimeout(() => {
-    console.log('Auto-removing popup');
-    if (popup.parentNode) {
-      popup.remove();
-      console.log('Popup removed');
-    }
-  }, 8000);
+const focusApp = () => {
+  window.electronAPI?.focusWindow();
 };
 
 const openDistractionWebsite = () => {
@@ -76,35 +19,7 @@ const openDistractionWebsite = () => {
   window.electronAPI?.openExternal(url);
 };
 
-const createRainbowDistraction = (distractionContainerRef) => {
-  const rainbow = document.createElement('div');
-  rainbow.className = 'rainbow-distraction';
-  rainbow.style.left = `${Math.random() * (window.innerWidth - 200)}px`;
-  rainbow.style.top = `${Math.random() * (window.innerHeight - 200)}px`;
 
-  distractionContainerRef.current?.appendChild(rainbow);
-
-  setTimeout(() => rainbow.remove(), 3000);
-};
-
-const createFlyingElements = (distractionContainerRef) => {
-  const elements = ['🦄', '🌈', '🎪', '🎮', '🎯', '🎨', '🎭', '🎪'];
-
-  for (let i = 0; i < 5; i++) {
-    setTimeout(() => {
-      const element = document.createElement('div');
-      element.className = 'flying-element';
-      element.textContent =
-        elements[Math.floor(Math.random() * elements.length)];
-      element.style.top = `${Math.random() * window.innerHeight}px`;
-      element.style.animationDelay = `${i * 0.5}s`;
-
-      distractionContainerRef.current?.appendChild(element);
-
-      setTimeout(() => element.remove(), 10000);
-    }, i * 1000);
-  }
-};
 
 const flashScreen = (distractionContainerRef) => {
   const flash = document.createElement('div');
@@ -220,6 +135,17 @@ const createGameWidgetDistraction = (distractionContainerRef) => {
 
   distractionContainerRef.current?.appendChild(widget);
 };
+// Timeout management (imported from App component through global scope)
+declare global {
+  interface Window {
+    distractionTimeout?: {
+      canTriggerDistraction: () => boolean;
+      startCooldown: () => void;
+      getRemainingCooldownTime: () => number;
+    };
+  }
+}
+
 const triggerRandomDistraction = (distractionContainerRef) => {
   console.log('triggerRandomDistraction called with:', distractionContainerRef);
   console.log(
@@ -227,38 +153,43 @@ const triggerRandomDistraction = (distractionContainerRef) => {
     distractionContainerRef?.current,
   );
 
-  const distractionType = Math.floor(Math.random() * 6); // Updated to 6 for game widget option
+  // Check if distraction is allowed (additional safety check)
+  if (window.distractionTimeout && !window.distractionTimeout.canTriggerDistraction()) {
+    const remainingTime = window.distractionTimeout.getRemainingCooldownTime();
+    console.log(`Distraction blocked by timeout system: ${remainingTime}s remaining`);
+    return false;
+  }
+
+  // Focus the app first so user sees the distraction
+  focusApp();
+
+  const distractionType = Math.floor(Math.random() * 3); // Reduced to 3 distraction types
   console.log('Selected distraction type:', distractionType);
 
   switch (distractionType) {
     case 0:
-      console.log('Creating distraction popup...');
-      createDistractionPopup(distractionContainerRef);
-      break;
-    case 1:
       console.log('Opening distraction website...');
       openDistractionWebsite();
       break;
-    case 2:
-      console.log('Creating rainbow distraction...');
-      createRainbowDistraction(distractionContainerRef);
-      break;
-    case 3:
-      console.log('Creating flying elements...');
-      createFlyingElements(distractionContainerRef);
-      break;
-    case 4:
+    case 1:
       console.log('Creating screen flash...');
       flashScreen(distractionContainerRef);
       break;
-    case 5:
+    case 2:
       console.log('Creating game widget distraction...');
       createGameWidgetDistraction(distractionContainerRef);
       break;
     default:
-      console.log('Default case: creating distraction popup...');
-      createDistractionPopup(distractionContainerRef);
+      console.log('Default case: opening distraction website...');
+      openDistractionWebsite();
   }
+
+  // Start cooldown after successful distraction
+  if (window.distractionTimeout) {
+    window.distractionTimeout.startCooldown();
+  }
+
+  return true;
 };
 
 export default triggerRandomDistraction;
