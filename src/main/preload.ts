@@ -5,7 +5,8 @@ import { contextBridge, ipcRenderer, IpcRendererEvent, shell } from 'electron';
 export type Channels =
   | 'ipc-example'
   | 'START_MONITORING'
-  | 'TRIGGER_DISTRACTION';
+  | 'TRIGGER_DISTRACTION'
+  | 'FOCUS_WINDOW';
 
 const electronAPI = {
   send: (channel: Channels, ...args: unknown[]) => {
@@ -25,6 +26,9 @@ const electronAPI = {
   },
   openExternal: (url: string) => {
     shell.openExternal(url);
+  },
+  focusWindow: () => {
+    ipcRenderer.send('FOCUS_WINDOW');
   },
 };
 
