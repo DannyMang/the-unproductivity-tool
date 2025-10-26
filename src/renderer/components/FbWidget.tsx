@@ -48,8 +48,8 @@ function FbWidget() {
                 <p>Price Listed: {offers[currentIndex].priceListed}</p>
                 <p>Price Offered: {offers[currentIndex].priceOffered}</p>
               </div>
-              <div className="normFlex">
-                <p>Status</p>
+              <div>
+                <p>Status:</p>
                 <p id="fbstatus">{offers[currentIndex].status}</p>
               </div>
             </div>
